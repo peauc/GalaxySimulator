@@ -4,11 +4,13 @@
 
 #include <utility>
 #include <logic/Star.hpp>
+#include <iostream>
 
 double Star::getX() const
 {
 	return x;
 }
+
 void Star::setX(double x)
 {
 	Star::x = x;

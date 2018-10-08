@@ -7,20 +7,19 @@
 #include "Star.hpp"
 #include "Quadrant.hpp"
 
-#define WITDH 1000
-#define HEIGHT 1000
+#define LENGTH 1000
 
 class Map{
 public:
 	Map();
 	
-	friend std::ostream &operator <<(std::ostream &os, const Map &map);
+	void generateQuadrantTree();
 	void generateStarMap();
+	friend std::ostream &operator <<(std::ostream &os, const Map &map);
+	const std::shared_ptr<Quadrant> &getQuadrantRoot() const;
+	
 private:
-	Quadrant 		quadrantRoot;
-public:
-	const Quadrant &getQuadrantRoot() const;
-private:
+	std::shared_ptr<Quadrant> 	quadrantRoot;
 	std::list<Star>		starList;
 
 };
