@@ -8,7 +8,7 @@
 
 int main(int ac, char **av) {
 	Map m;
-	Display d(1000, m.getQuadrantRoot());
+	Display d(1000, m.getQuadrantRoot(), m.getStarList());
 	d.init(ac, av);
 	return (0);
 }

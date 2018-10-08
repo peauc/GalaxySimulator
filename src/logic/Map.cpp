@@ -43,3 +43,7 @@ const std::shared_ptr<Quadrant> &Map::getQuadrantRoot() const
 {
 	return quadrantRoot;
 }
+const std::list<Star> &Map::getStarList() const
+{
+	return starList;
+}

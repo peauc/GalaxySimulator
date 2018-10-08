@@ -27,9 +27,6 @@ void Quadrant::insertToNode(Star &star)
 		quadrant->insertToNode(star);
 		this->addToStarList(star);
 	}
-	// If there is no star contained in this quadrant the star passed as
-	// parameter is put in
-	
 }
 
 //try to get the SubQuadrant if it does not exist it created it
@@ -114,10 +111,14 @@ void Quadrant::computeMassOfQuadrant()
 		
 		double ret = 0;
 		for(auto it = this->getQuadrantList().begin(); it < this->getQuadrantList().end(); it++) {
-			(*it)->computeMassOfQuadrant();
-			this->mass += (*it)->getMass();
-			this->centerMassX += (*it)->getCenterMassX() * (*it)->getMass();
-			this->centerMassY += (*it)->getCenterMassY() * (*it)->getMass();
+			if (*it) {
+				(*it)->computeMassOfQuadrant();
+				this->mass += (*it)->getMass();
+				this->centerMassX += (*it)->getCenterMassX() *
+						     (*it)->getMass();
+				this->centerMassY += (*it)->getCenterMassY() *
+						     (*it)->getMass();
+			}
 		}
 		this->centerMassY /= this->getMass();
 		this->centerMassX /= this->getMass();
@@ -161,8 +162,8 @@ std::pair<double, double> Quadrant::computeAcceleration(const Star &star1, const
 	
 	if ((&star1 == &star2) || (star1.getY() == star2.getY() && star1.getX() == star2.getX()))
 		return ret;
-	double r = sqrt((star1.getX() - star2.getX()) * (star1.getX() - star2.getX()) + (star1.getY() - star2.getY()) * (star1.getY() - star2.getY()));
-	double k = G * star2.getWeight() / (r*r*r);
+	double r = sqrt((star1.getX() - star2.getX()) * (star1.getX() - star2.getX()) + (star1.getY() - star2.getY()) * (star1.getY() - star2.getY()) + SOFTENER);
+	double k = G * star1.getWeight() / (r*r*r);
 	ret.first = k * (star2.getX() - star1.getX());
 	ret.second = k * (star2.getY() - star1.getY());
 	return (ret);

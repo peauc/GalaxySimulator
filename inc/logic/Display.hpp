@@ -5,7 +5,7 @@
 
 class Display {
 public:
-	Display(int size, std::shared_ptr<Quadrant> Quandrant);
+	Display(int size, std::shared_ptr<Quadrant> Quandrant, const std::list<Star> &star);
 	void init(int arc, char **argv);
 	static void render();
 	static void drawQuadrants();
@@ -14,7 +14,7 @@ public:
 private:
 	int size;
 	std::shared_ptr<Quadrant> Quadrant;
-	static void drawPoints(const std::vector<Star> &vector);
+	static void drawPoints(const std::list<Star> &vector);
 };
 
 #endif //MULTICOREGALAXY_DISPLAY_HPP

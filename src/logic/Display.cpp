@@ -9,13 +9,15 @@
 #import "logic/Quadrant.hpp"
 
 std::shared_ptr<Quadrant> Quad;
+std::list<Star> Star;
 
-Display::Display(int size, std::shared_ptr<class Quadrant> Quadrant) : size(size)
+Display::Display(int size, std::shared_ptr<class Quadrant> quadrant, const std::list<class Star> &star) : size(size)
 {
-	Quad = Quadrant;
+	Quad = quadrant;
+	Star = star;
 }
 
-void Display::drawPoints(const std::vector<Star> &vector)
+void Display::drawPoints(const std::list<class Star> &vector)
 {
 	glBegin(GL_POINTS);
 	glColor3f(1, 1, 1);
@@ -52,9 +54,9 @@ void Display::drawQuadrants() {
 
 void Display::render()
 {
-	for(auto it = Quad->getRawStarList().begin(); it != Quad->getRawStarList().end() ; it++) {
+	Quad->computeMassOfQuadrant();
+	for(auto it = Star.begin(); it != Star.end() ; it++) {
 		auto acc = Quad->computeTreeForce((*it));
-		std::cout << acc.first << " " << acc.second << " " << std::endl;
 		(*it).setX((*it).getX() + acc.first);
 		(*it).setY((*it).getY() + acc.second);
 	}
@@ -64,7 +66,7 @@ void Display::render()
 		gluOrtho2D(0, 1000.0, 1000.0, 0);
 		
 		drawQuadrants();
-		drawPoints(Quad->getContainedStarList());
+		drawPoints(Star);
 		glFlush();
 		glutSwapBuffers();
 }

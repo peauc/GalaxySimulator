@@ -20,6 +20,9 @@ public:
 	
 private:
 	std::shared_ptr<Quadrant> 	quadrantRoot;
+public:
+	const std::list<Star> &getStarList() const;
+private:
 	std::list<Star>		starList;
 
 };

@@ -15,6 +15,7 @@ enum QuadrantPosition {
 	None = -1
 };
 
+#define SOFTENER 0.1*0.1
 #define THETA 0.5
 #define G 0.1
 class Quadrant
