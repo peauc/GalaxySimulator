@@ -1,14 +1,9 @@
 
 #include <iostream>
-#include <GLUT/glut.h>
-#include "logic/Display.hpp"
-#include "logic/Map.hpp"
-#include "logic/Display.hpp"
-#include "logic/Quadrant.hpp"
 
 int main(int ac, char **av) {
-	Map m;
-	Display d(1000, m.getQuadrantRoot(), m.getStarList());
-	d.init(ac, av);
+	std::cout << "Start of the program" << '\n';
+	
+	std::cout << "End of the program" << std::endl;
 	return (0);
 }
