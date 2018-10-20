@@ -50,7 +50,7 @@ void Display::drawQuadrantsRec(class Quadrant *quadrant)
 void Display::drawQuadrants() {
 	glLineWidth(0.2);
 	glColor3f(0.3, 0.3, 0.3);
-	//drawQuadrantsRec(Quad.get());
+	drawQuadrantsRec(Quad.get());
 }
 
 void Display::render()
@@ -62,7 +62,7 @@ void Display::render()
 		it->setY(it->getY() + acc.second);
 	}
 	//Reset the nodes to their good quadrants
-	//Quad->adjustQuadrant();
+	Quad->adjustQuadrant();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

@@ -16,7 +16,7 @@ void Map::generateStarMap()
 	std::srand(static_cast<unsigned int>(std::time(0)));
 	auto center_star = std::make_shared<Star>(LENGTH / 2, LENGTH / 2, 100000);
 	this->starList.emplace_back(center_star);
-	for(int i = 0; i < 1000; ++i) {
+	for(int i = 0; i < 5; ++i) {
 		auto star = std::make_shared<Star>(
 			250 + std::rand() % 500,
 			250 + std::rand() % 500,

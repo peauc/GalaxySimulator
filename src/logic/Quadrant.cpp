@@ -175,8 +175,8 @@ void Quadrant::insertToParent(std::shared_ptr<Star> &star)
 void Quadrant::adjustQuadrant()
 {
 	//IF no subquadrant
-	if (this->parent) {
-		for(auto i = 0; i < this->getNumberOfStarsContained(); i++) {
+	if (this->parent && this->getNumberOfStarsContained() > 0) {
+		for(auto i = 0; i < this->starList.size(); i++) {
 			if (this->starList[i] && !this->isContained(this->starList[i])) {
 				this->parent->insertToParent(this->starList[i]);
 				this->starList.erase(this->starList.begin() + i);
