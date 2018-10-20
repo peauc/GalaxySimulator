@@ -1,16 +1,14 @@
-//
-// Created by Clément Péau on 2018-10-20.
-//
-
 #ifndef MULTICOREGALAXY_STAR_HPP
 #define MULTICOREGALAXY_STAR_HPP
+#include <utils/SpacialInformations.hpp>
 
-class Star {
+class Star : public SpacialInformations {
 public:
-	Star();
-	~Star()
+	Star(double x, double y, double mass);
+	~Star();
 	
-	Star(Star &star) = default;
+	Star(const Star &star);
+private:
 };
 
 #endif //MULTICOREGALAXY_STAR_HPP
