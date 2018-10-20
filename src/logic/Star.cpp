@@ -6,6 +6,10 @@
 #include <logic/Star.hpp>
 #include <iostream>
 
+Star::~Star()
+{
+	std::cout << "A star died" << std::endl;
+}
 double Star::getX() const
 {
 	return x;

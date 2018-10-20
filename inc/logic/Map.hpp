@@ -13,17 +13,13 @@ class Map{
 public:
 	Map();
 	
-	void generateQuadrantTree();
 	void generateStarMap();
 	friend std::ostream &operator <<(std::ostream &os, const Map &map);
-	const std::shared_ptr<Quadrant> &getQuadrantRoot() const;
-	
+	std::shared_ptr<Quadrant> &getQuadrantRoot();
+	std::list<std::shared_ptr<Star>> &getStarList();
 private:
-	std::shared_ptr<Quadrant> 	quadrantRoot;
-public:
-	const std::list<Star> &getStarList() const;
-private:
-	std::list<Star>		starList;
+	std::shared_ptr<Quadrant>		quadrantRoot;
+	std::list<std::shared_ptr<Star>>	starList;
 
 };
 

@@ -21,40 +21,47 @@ enum QuadrantPosition {
 class Quadrant
 {
 public:
-	//Gravitational constant
 	//SubQuad Constructor
-	Quadrant(double x, double y, double length, QuadrantPosition &position);
+	Quadrant(double x, double y, double length, QuadrantPosition &position, Quadrant *quadrant);
 	//RootQuad Constructor
 	Quadrant(double length);
 	
-	QuadrantPosition getPosition(const Star &star) const;
+	QuadrantPosition getPosition(Star &star) const;
+	const std::vector<std::shared_ptr<Star>> &getContainedStarList() const;
+	std::vector<std::shared_ptr<Star>> &getRawStarList();
+	const std::vector<std::shared_ptr<Quadrant>> &getQuadrantList() const;
+	
+	void insertToParent(std::shared_ptr<Star> &star);
+	void adjustQuadrant();
+	void insertToNode(std::shared_ptr<Star> & star);
+	void computeMassOfQuadrant();
+	
 	double getLength() const;
-	const std::vector<Star> &getContainedStarList() const;
-	void insertToNode(Star &star);
 	double getX() const;
 	double getY() const;
-	std::pair<double,double> computeTreeForce(const Star &star) const;
-	std::pair<double, double> computeAcceleration(const Star &star1, const Star &star2) const;
-	void computeMassOfQuadrant();
 	double getCenterMassX() const;
 	double getCenterMassY() const;
 	double getMass() const;
-	std::vector<Star> &getRawStarList();
+	bool isContained(std::shared_ptr<Star> &star);
+	
+	std::pair<double,double> computeTreeForce(std::shared_ptr<Star> star) const;
+	std::pair<double, double> computeAcceleration(std::shared_ptr<Star> star1, std::shared_ptr<Star> star2) const;
+
 private:
-	unsigned long getNumberOfStarsContained() const;
 	double length;
 	double x;
 	double y;
 	double centerMassX;
 	double centerMassY;
 	double mass;
+	Quadrant *parent;
+	
+	void addToStarList(std::shared_ptr<Star> &star);
+	unsigned long getNumberOfStarsContained() const;
 	
 	std::vector<std::shared_ptr<Quadrant>>	quadrantList;
-public:
-	const std::vector<std::shared_ptr<Quadrant>> &getQuadrantList() const;
-private:
-	std::vector<Star>	starList;
-	std::shared_ptr<Quadrant> getOrCreateSubQuadrant(Star &star);
-	void addToStarList(Star &star);
+	std::vector<std::shared_ptr<Star>>	starList;
+	std::shared_ptr<Quadrant> getOrCreateSubQuadrant(std::shared_ptr<Star> &star);
+	bool isLeafNode();
 };
 #endif //MULTICOREGALAXY_QUADRANT_HPP

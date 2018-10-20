@@ -19,6 +19,7 @@ public:
 	void setY(double y);
 	std::pair<double, double> getPosition() const;
 	double getWeight() const;
+	virtual ~Star();
 private:
 	void setWeight(double weight);
 };
