@@ -5,6 +5,10 @@
 #include "logic/Star.hpp"
 #include "utils/SpacialInformations.hpp"
 
+#define THETA 0.5
+#define G 0.1
+#define SOFTENER 0.1*0.1
+
 class Quadrant : public SpacialInformations {
 	//Had to put the helper class inside the main class due to circular
 	// inclusion problems, the code file is still
@@ -30,6 +34,10 @@ class Quadrant : public SpacialInformations {
 		QuadrantContainer(class QuadrantContainer &quadrantContainer) = default;
 		bool isLeaf();
 	private:
+	public:
+		const std::vector<std::shared_ptr<Quadrant>> &
+		get_quadrantList() const;
+	private:
 		class Quadrant	&_containerQuadrant;
 		std::vector<std::shared_ptr<class Quadrant>> _quadrantList;
 	};
@@ -42,6 +50,10 @@ public:
 	void addToStarList(std::shared_ptr<Star> &star);
 	void addToStarList(std::vector<std::shared_ptr<Star>> vec);
 	void balance();
+	void computeMassOfQuadrant();
+	std::pair<double, double> computeTreeForce(std::shared_ptr<Star> star) const;
+	std::pair<double, double> computeAcceleration(std::shared_ptr<Star> star1, std::shared_ptr<Star> star2) const;
+	const QuadrantContainer &get_links() const;
 	QuadrantContainer::QuadrantPosition getPosition(Star &star) const;
 private:
 	std::vector<std::shared_ptr<Star>> _starList;
@@ -49,6 +61,8 @@ private:
 	class Quadrant *parent;
 	
 	bool isLeaf();
+	bool isNotContained(std::shared_ptr<Star> &shared_ptr);
+	void insertToParentNodeRec(std::shared_ptr<Star> &shared_ptr);
 };
 
 

@@ -60,4 +60,9 @@ void Quadrant::QuadrantContainer::insertToNode(std::vector<std::shared_ptr<Star>
 		quad->addToStarList(item);
 	}
 }
+const std::vector<std::shared_ptr<Quadrant>> &
+Quadrant::QuadrantContainer::get_quadrantList() const
+{
+	return _quadrantList;
+}
 

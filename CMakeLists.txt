@@ -18,9 +18,15 @@ file(GLOB_RECURSE LOGIC_SOURCE
 file(GLOB_RECURSE LOGIC_INCLUDE
         inc/logic/*.hpp)
 
+file(GLOB_RECURSE DISPLAY_SOURCE
+        src/display/*.cpp)
+file(GLOB_RECURSE DISPLAY_INCLUDE
+        inc/display/*.hpp)
+
 add_executable(MulticoreGalaxy
         ${LOGIC_SOURCE} ${LOGIC_INCLUDE}
         ${UTILS_SOURCE} ${UTILS_INCLUDE}
+        ${DISPLAY_SOURCE} ${DISPLAY_INCLUDE}
         src/main.cpp)
 target_link_libraries(MulticoreGalaxy ${GLFW_LIBRARIES} ${GLEW_LIBRARIES}
         ${OPENGL_gl_LIBRARY} ${GLUT_LIBRARY} pthread)

@@ -20,7 +20,13 @@ public:
 	void setHeight(double height);
 	double getWidth() const;
 	void setWidth(double width);
+	double getCmx() const;
+	void setCmx(double _cmx);
+	double getCmy() const;
+	void setCmy(double _cmy);
 private:
+	double _cmx;
+	double _cmy;
 	double _height;
 	double _width;
 	double _x;

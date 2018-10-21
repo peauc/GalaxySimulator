@@ -54,4 +54,20 @@ void SpacialInformations::setWidth(double width)
 {
 	SpacialInformations::_width = width;
 }
+double SpacialInformations::getCmx() const
+{
+	return _cmx;
+}
+void SpacialInformations::setCmx(double _cmx)
+{
+	SpacialInformations::_cmx = _cmx;
+}
+double SpacialInformations::getCmy() const
+{
+	return _cmy;
+}
+void SpacialInformations::setCmy(double _cmy)
+{
+	SpacialInformations::_cmy = _cmy;
+}
 
