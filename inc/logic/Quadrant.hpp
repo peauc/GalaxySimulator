@@ -20,10 +20,15 @@ class Quadrant : public SpacialInformations {
 		};
 		QuadrantContainer(Quadrant &parent);
 		~QuadrantContainer();
+		void insertToNode(std::vector<std::shared_ptr<Star>> &starList);
+		void balance();
+		
+		
 		void createQuadrantAtPosition(QuadrantPosition &pos);
 		std::shared_ptr<class Quadrant> getQuadrantAtPosition(QuadrantPosition &pos);
 		std::shared_ptr<class Quadrant> getOrCreateQuadrantAtPosition(QuadrantPosition &pos);
 		QuadrantContainer(class QuadrantContainer &quadrantContainer) = default;
+		bool isLeaf();
 	private:
 		class Quadrant	&_containerQuadrant;
 		std::vector<std::shared_ptr<class Quadrant>> _quadrantList;
@@ -31,16 +36,20 @@ class Quadrant : public SpacialInformations {
 
 
 public:
-	~Quadrant() = default;
-	Quadrant(class Quadrant &quadrant) = default;
-	
-	void insertToNode(std::shared_ptr<Star> star);
-	QuadrantContainer::QuadrantPosition getPosition(Star &star) const;
 	Quadrant(double x, double y, double size, Quadrant *parent);
+	~Quadrant() = default;
+	Quadrant(class Quadrant &quadrant, QuadrantContainer::QuadrantPosition &pos);
+	void addToStarList(std::shared_ptr<Star> &star);
+	void addToStarList(std::vector<std::shared_ptr<Star>> vec);
+	void balance();
+	QuadrantContainer::QuadrantPosition getPosition(Star &star) const;
 private:
 	std::vector<std::shared_ptr<Star>> _starList;
 	class QuadrantContainer _links;
 	class Quadrant *parent;
+	
+	bool isLeaf();
 };
+
 
 #endif
