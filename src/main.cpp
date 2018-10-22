@@ -10,10 +10,12 @@ int main(int ac, char **av) {
 	std::cout << "Start of the program" << '\n';
 	std::srand(static_cast<unsigned int>(std::time(0)));
 	std::vector<std::shared_ptr<Star>> vec;
-
-	auto center_star = std::make_shared<Star>(1000 / 2, 1000 / 2, 100000);
-	vec.emplace_back(center_star);
-	for(int i = 0; i < 1000 ; ++i) {
+	{
+		auto center_star = std::make_shared<Star>(500, 500,
+							  500000);
+		vec.emplace_back(center_star);
+	}
+	for(int i = 0; i < 100; ++i) {
 		vec.emplace_back(std::make_shared<Star>(
 			250 + std::rand() % 500,
 			250 + std::rand() % 500,

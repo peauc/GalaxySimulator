@@ -5,18 +5,18 @@
 #include <cmath>
 #include "logic/Quadrant.hpp"
 
-Quadrant::Quadrant(class Quadrant &quadrant, QuadrantContainer::QuadrantPosition &pos) : _links(*this)
+Quadrant::Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos) : _links(*this), parent(quadrant)
 {
-	this->setWidth(quadrant.getWidth() / 2);
-	this->setHeight(quadrant.getWidth() / 2);
+	this->setWidth(quadrant->getWidth() / 2);
+	this->setHeight(quadrant->getWidth() / 2);
 	if (pos == QuadrantContainer::QuadrantPosition::NorthEast || pos == QuadrantContainer::QuadrantPosition::NorthWest)
-		this->setY(quadrant.getY());
+		this->setY(quadrant->getY());
 	else
-		this->setY(quadrant.getY() + quadrant.getWidth() / 2);
+		this->setY(quadrant->getY() + quadrant->getWidth() / 2);
 	if (pos == QuadrantContainer::QuadrantPosition::SouthEast || pos == QuadrantContainer::QuadrantPosition::NorthEast)
-		this->setX( quadrant.getX() + quadrant.getWidth() / 2);
+		this->setX( quadrant->getX() + quadrant->getWidth() / 2);
 	else
-		this->setX(quadrant.getX());
+		this->setX(quadrant->getX());
 }
 
 Quadrant::Quadrant(double x, double y, double size, Quadrant *parent) :
@@ -62,22 +62,29 @@ void Quadrant::balance()
 		if (this->isNotContained(this->_starList[i])) {
 			if (this->parent) {
 				this->parent->insertToParentNodeRec(this->_starList[i]);
-			}
-			else {
-			
-			}
+			} // Out of the screen
+			this->_starList.erase(this->_starList.begin() + i);
+			--i;
 		}
 	}
 	if (this->getWidth() / 2 > 1) {
-		if (this->_starList.size() != 1 && this->isLeaf()){
+		if (!this->_starList.empty()){
 			this->_links.insertToNode(this->_starList);
 			this->_starList.clear();
 		}
 	}
 	if (!this->isLeaf()) {
 		this->_links.balance();
+		//this->verifyUselessQuadrant();
 	}
 }
+
+void Quadrant::verifyUselessQuadrant()
+{
+	if (this->_links.isUseless())
+		this->_links.clearLinks();
+}
+
 bool Quadrant::isLeaf()
 {
 	return (this->_links.isLeaf());
@@ -141,7 +148,7 @@ std::pair<double, double> Quadrant::computeAcceleration(std::shared_ptr<Star> st
 	
 	if ((&star1 == &star2) || (star1->getY() == star2->getY() && star1->getX() == star2->getX()))
 		return ret;
-	double r = sqrt((star1->getX() - star2->getX()) * (star1->getX() - star2->getX()) + (star1->getY() - star2->getY()) * (star1->getY() - star2->getY()) + SOFTENER);
+	double r = sqrt((star1->getX() - star2->getX()) * (star1->getX() - star2->getX()) + (star1->getY() - star2->getY()) * (star1->getY() - star2->getY()));
 	double k = G * star1->getMass() / (r*r*r);
 	ret.first = k * (star2->getX() - star1->getX());
 	ret.second = k * (star2->getY() - star1->getY());

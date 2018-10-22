@@ -61,6 +61,7 @@ void Display::render()
 		it->setX(it->getX() + acc.first);
 		it->setY(it->getY() + acc.second);
 	}
+	Quad->getRootQuadrant().balance();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

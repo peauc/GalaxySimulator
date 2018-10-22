@@ -24,7 +24,7 @@ std::shared_ptr<class Quadrant> Quadrant::QuadrantContainer::getQuadrantAtPositi
 void Quadrant::QuadrantContainer::createQuadrantAtPosition(Quadrant::QuadrantContainer::QuadrantPosition &pos)
 {
 	if (this->_quadrantList.at(pos) == nullptr) {
-		this->_quadrantList.at(pos) = std::make_shared<Quadrant>(_containerQuadrant, pos);
+		this->_quadrantList.at(pos) = std::make_shared<Quadrant>(&_containerQuadrant, pos);
 	}
 }
 std::shared_ptr<class Quadrant> Quadrant::QuadrantContainer::getOrCreateQuadrantAtPosition(Quadrant::QuadrantContainer::QuadrantPosition &pos)
@@ -51,18 +51,43 @@ void Quadrant::QuadrantContainer::balance()
 	}
 }
 
+void Quadrant::QuadrantContainer::insertToNode(std::shared_ptr<Star> &item)
+{
+	auto pos = _containerQuadrant.getPosition(*item);
+	auto quad = this->getOrCreateQuadrantAtPosition(pos);
+	quad->addToStarList(item);
+}
+
 void Quadrant::QuadrantContainer::insertToNode(std::vector<std::shared_ptr<Star>> &starList)
 {
 
 	for (auto &item: starList) {
-		auto pos = _containerQuadrant.getPosition(*item);
-		auto quad = this->getOrCreateQuadrantAtPosition(pos);
-		quad->addToStarList(item);
+		this->insertToNode(item);
 	}
 }
 const std::vector<std::shared_ptr<Quadrant>> &
 Quadrant::QuadrantContainer::get_quadrantList() const
 {
 	return _quadrantList;
+}
+
+bool Quadrant::QuadrantContainer::isUseless()
+{
+	//If a quadrant is the leaf, he has things in his starlist so ret will be false.
+	//Else we will look into each quadrant recursively if he has a star inside
+	bool ret = this->_containerQuadrant._starList.empty();
+	if (!this->isLeaf()) {
+		for (auto &it: this->_quadrantList) {
+			if (it && !it->_links.isUseless() && !it->_starList.empty())
+				ret = false;
+		}
+	}
+	return ret;
+}
+void Quadrant::QuadrantContainer::clearLinks()
+{
+	for(auto &i : this->_quadrantList) {
+		i = nullptr;
+	}
 }
 

@@ -25,6 +25,7 @@ class Quadrant : public SpacialInformations {
 		QuadrantContainer(Quadrant &parent);
 		~QuadrantContainer();
 		void insertToNode(std::vector<std::shared_ptr<Star>> &starList);
+		void insertToNode(std::shared_ptr<Star> &star);
 		void balance();
 		
 		
@@ -33,6 +34,8 @@ class Quadrant : public SpacialInformations {
 		std::shared_ptr<class Quadrant> getOrCreateQuadrantAtPosition(QuadrantPosition &pos);
 		QuadrantContainer(class QuadrantContainer &quadrantContainer) = default;
 		bool isLeaf();
+		bool isUseless();
+		void clearLinks();
 	private:
 	public:
 		const std::vector<std::shared_ptr<Quadrant>> &
@@ -46,7 +49,7 @@ class Quadrant : public SpacialInformations {
 public:
 	Quadrant(double x, double y, double size, Quadrant *parent);
 	~Quadrant() = default;
-	Quadrant(class Quadrant &quadrant, QuadrantContainer::QuadrantPosition &pos);
+	Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos);
 	void addToStarList(std::shared_ptr<Star> &star);
 	void addToStarList(std::vector<std::shared_ptr<Star>> vec);
 	void balance();
@@ -63,7 +66,7 @@ private:
 	bool isLeaf();
 	bool isNotContained(std::shared_ptr<Star> &shared_ptr);
 	void insertToParentNodeRec(std::shared_ptr<Star> &shared_ptr);
+	void verifyUselessQuadrant();
 };
-
 
 #endif
