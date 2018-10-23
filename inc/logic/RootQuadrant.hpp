@@ -9,7 +9,6 @@ public:
 	~RootQuadrant() = default;
 	void simulationLoop(tbb::task_group &gr);
 	std::mutex computeLock;
-	std::mutex displayLock;
 	
 	RootQuadrant(RootQuadrant &rootQuadrant) = default;
 	Quadrant &getRootQuadrant();

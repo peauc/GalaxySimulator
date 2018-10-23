@@ -27,7 +27,6 @@ void RootQuadrant::simulationLoop(tbb::task_group &gr)
 			       computeLock.lock();
 			       _rootQuadrant.computeMassOfQuadrant();
 			       //calculate the accel
-			       std::cout << this->_starVector.size() << std::endl;
 			       tbb::parallel_for(
 				       tbb::blocked_range<size_t>(0, this->_starVector.size()), [this](const tbb::blocked_range<size_t> &it)
 				       {
@@ -46,7 +45,7 @@ void RootQuadrant::simulationLoop(tbb::task_group &gr)
 				       }
 			       });
 			       _rootQuadrant.balance();
-			       displayLock.unlock();
+			       computeLock.unlock();
 		       }
 #pragma clang diagnostic pop
 	       });
