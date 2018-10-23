@@ -1,255 +1,158 @@
+//
+// Created by Clément Péau on 2018-10-20.
+//
 
-#include <memory>
-#include <logic/Quadrant.hpp>
 #include <cmath>
 #include "logic/Quadrant.hpp"
+#include "logic/RootQuadrant.hpp"
+#include <tbb/task.h>
+#include <tbb/task_group.h>
+#include <tbb/parallel_for.h>
 
-void Quadrant::insertToNode(std::shared_ptr<Star> & star)
+Quadrant::Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos) : _links(*this), parent(quadrant)
 {
-	if (this->length / 2 < 1) {
-		this->addToStarList(star);
-	}
-	/* If there is only one star contained in the quadrant we create
-	// subquadrants and set the existing star to one
-	*/
-	else {
-		if (this->getNumberOfStarsContained() != 0) {
-			auto existingStar = this->starList.front();
-			if (existingStar) {
-				auto quadrant = this->getOrCreateSubQuadrant(existingStar);
-				quadrant->insertToNode(existingStar);
-			}
-		}
-		
-		auto quadrant = this->getOrCreateSubQuadrant(star);
-		if (quadrant)
-			quadrant->insertToNode(star);
-	}
+	this->setX(0);
+	this->setY(0);
+	this->setAccy(0);
+	this->setAccx(0);
+	this->setCmx(0);
+	this->setMass(0);
+	this->setCmy(0);
+	this->setWidth(quadrant->getWidth() / 2);
+	this->setHeight(quadrant->getWidth() / 2);
+	if (pos == QuadrantContainer::QuadrantPosition::NorthEast || pos == QuadrantContainer::QuadrantPosition::NorthWest)
+		this->setY(quadrant->getY());
+	else
+		this->setY(quadrant->getY() + quadrant->getWidth() / 2);
+	if (pos == QuadrantContainer::QuadrantPosition::SouthEast || pos == QuadrantContainer::QuadrantPosition::NorthEast)
+		this->setX( quadrant->getX() + quadrant->getWidth() / 2);
+	else
+		this->setX(quadrant->getX());
 }
 
-//try to get the SubQuadrant if it does not exist it create it
-std::shared_ptr<Quadrant> Quadrant::getOrCreateSubQuadrant(std::shared_ptr<Star> &star)
+Quadrant::Quadrant(double x, double y, double size, Quadrant *parent) :
+	_links(*this)
 {
-	if (!star)
-		return (nullptr);
-	auto position = this->getPosition(*star);
-	auto subQuadrant = this->quadrantList.at(position);
-	if (subQuadrant == nullptr) {
-		auto newQuadrant = std::make_shared<Quadrant>(this->getX(), this->getY(), this->getLength(), position, this);
-		this->quadrantList[position] = newQuadrant;
-		return newQuadrant;
-	}
-	return subQuadrant;
+	this->setX(x);
+	this->setY(y);
+	this->setAccy(0);
+	this->setAccx(0);
+	this->setCmx(0);
+	this->setCmy(0);
+	this->setHeight(size);
+	this->setWidth(size);
+	this->setMass(0);
+	this->parent = parent;
 }
 
-QuadrantPosition Quadrant::getPosition(Star &star) const
+Quadrant::QuadrantContainer::QuadrantPosition Quadrant::getPosition(Star &star) const
 {
-	auto relativeX = star.getX() - this->getX();
-	auto relativeY = star.getY() - this->getY();
-	auto halfQuadrantLength = this->length / 2;
+	auto relativeX = star.getX() - getX();
+	auto relativeY = star.getY() - getY();
+	auto halfQuadrantLength = getWidth() / 2;
 	
 	if (relativeX > halfQuadrantLength && relativeY <= halfQuadrantLength)
 	{
-		return NorthEast;
+		return QuadrantContainer::NorthEast;
 	} else if (relativeX <= halfQuadrantLength && relativeY <= halfQuadrantLength) {
-		return NorthWest;
+		return QuadrantContainer::NorthWest;
 	} else if (relativeX <= halfQuadrantLength && relativeY > halfQuadrantLength) {
-		return SouthWest;
+		return QuadrantContainer::SouthWest;
 	} else
-		return SouthEast;
+		return QuadrantContainer::SouthEast;
 	
 }
 
-
-//Create an empty quadrant and initialize the quadrantList
-Quadrant::Quadrant(double x, double y, double length, QuadrantPosition &position, Quadrant *quadrant) : parent(quadrant)
+void Quadrant::insertToParentNodeRec(std::shared_ptr<Star> &shared_ptr)
 {
-	this->length = length / 2;
-	if (position == NorthEast || position == NorthWest)
-		this->y = y;
+	if (isNotContained(shared_ptr) && this->parent)
+		this->parent->insertToParentNodeRec(shared_ptr);
 	else
-		this->y = y + length / 2;
-	if (position == SouthEast || position == NorthEast)
-		this->x = x + length / 2;
-	else
-		this-> x = x;
-	this->quadrantList =
-		{
-			nullptr,
-			nullptr,
-			nullptr,
-			nullptr,
-		};
+		this->_starList.emplace_back(shared_ptr);
 }
 
-//create Root Quadrant
-Quadrant::Quadrant(double length)
+void Quadrant::balance()
 {
-	this->parent = nullptr;
-	this->x = 0;
-	this->y = 0;
-	this->length = length;
-	this->quadrantList =
-		{
-			nullptr,
-			nullptr,
-			nullptr,
-			nullptr,
-		};
+	for(auto i = 0; i < this->_starList.size(); i++) {
+		if (this->isNotContained(this->_starList[i])) {
+			if (this->parent) {
+				this->parent->insertToParentNodeRec(this->_starList[i]);
+				this->_starList.erase(
+					this->_starList.begin() + i);
+				--i;
+				
+			} // Out of the screen
+			else {
+				this->_starList.erase(this->_starList.begin() + i);
+				--i;
+			}
+		}
+	}
+	if (this->getWidth() / 2 > 1) {
+		if (this->_starList.size() > 1){
+			this->_links.insertToNode(this->_starList);
+			this->_starList.clear();
+		}
+	}
+	if (!this->isLeaf()) {
+		this->_links.balance();
+		this->verifyUselessQuadrant();
+	}
+}
+
+void Quadrant::verifyUselessQuadrant()
+{
+	if (this->_links.isUseless())
+		this->_links.clearLinks();
+}
+
+bool Quadrant::isLeaf()
+{
+	return (this->_links.isLeaf());
 }
 
 void Quadrant::computeMassOfQuadrant()
 {
-	if (this->getNumberOfStarsContained() == 1) {
-		auto star = starList.front();
-		this->centerMassX = star->getX();
-		this->centerMassY = star->getY();
-		this->mass = star->getWeight();
+	if (this->_starList.size() == 1) {
+		auto star = this->_starList.front();
+		this->setCmx(star->getX());
+		this->setCmy(star->getY());
+		this->setMass(star->getMass());
 	} else {
-		this->mass = 0;
-		this->centerMassY = 0;
-		this->centerMassX = 0;
+		this->setMass(0);
+		this->setCmy(0);
+		this->setCmx(0);
 		
-		for(auto it = this->getQuadrantList().begin(); it < this->getQuadrantList().end(); it++) {
-			if (*it) {
-				(*it)->computeMassOfQuadrant();
-				this->mass += (*it)->getMass();
-				this->centerMassX += (*it)->getCenterMassX() *
-						     (*it)->getMass();
-				this->centerMassY += (*it)->getCenterMassY() *
-						     (*it)->getMass();
+		for(auto &it: this->_links.get_quadrantList()) {
+			if (it) {
+				it->computeMassOfQuadrant();
+				this->setMass(it->getMass() + this->getMass());
+				this->setCmx(this->getCmx() + (it->getCmx() * it->getMass()));
+				this->setCmy(this->getCmy() + (it->getCmy() * it->getMass()));
 			}
 		}
-		this->centerMassY /= this->getMass();
-		this->centerMassX /= this->getMass();
+		this->setCmx(this->getCmx() / this->getMass());
+		this->setCmy(this->getCmy() / this->getMass());
 	}
 	
 }
 
-std::pair<double, double> Quadrant::computeTreeForce(std::shared_ptr<Star> star) const
+bool Quadrant::isNotContained(std::shared_ptr<Star> &star)
 {
-	double r,k,d;
-	auto acc = std::make_pair<double,double>(0, 0);
-	
-		r = sqrt((star->getX() - this->getCenterMassX()) * (star->getX() - this->getCenterMassX()) +
-			(star->getY() - this->getCenterMassY()) * (star->getY() - this->getCenterMassY()));
-		d = this->getLength();
-		if (d/r <= THETA) {
-			k = this->getMass() * G / (r*r*r);
-			acc.first =k * (this->centerMassX - star->getX());
-			acc.second = k * (this->centerMassY - star->getY());
-		} else {
-			for(const auto &it : this->getQuadrantList()) {
-				if (it) {
-					auto tmp = it->computeTreeForce(star);
-					acc.first += tmp.first;
-					acc.second += tmp.second;
-				}
-			}
-		}
-	
-	
-	return acc;
+	return (star->getX() < this->getX() || star->getX() > this->getX() + this->getWidth() || star->getY() < this->getY() || star->getY() > this->getY() + this->getWidth());
 }
 
-std::pair<double, double> Quadrant::computeAcceleration(std::shared_ptr<Star> star1, std::shared_ptr<Star> star2) const
+void Quadrant::addToStarList(std::vector<std::shared_ptr<Star>> vec)
 {
-	auto ret = std::make_pair<double, double>(0, 0);
-	
-	if ((&star1 == &star2) || (star1->getY() == star2->getY() && star1->getX() == star2->getX()))
-		return ret;
-	double r = sqrt((star1->getX() - star2->getX()) * (star1->getX() - star2->getX()) + (star1->getY() - star2->getY()) * (star1->getY() - star2->getY()) + SOFTENER);
-	double k = G * star1->getWeight() / (r*r*r);
-	ret.first = k * (star2->getX() - star1->getX());
-	ret.second = k * (star2->getY() - star1->getY());
-	return (ret);
-}
-
-void Quadrant::insertToParent(std::shared_ptr<Star> &star)
-{
-	if (!this->isContained(star))
-		this->parent->insertToParent(star);
-	this->insertToNode(star);
-}
-
-void Quadrant::adjustQuadrant()
-{
-	//IF no subquadrant
-	if (this->parent && this->getNumberOfStarsContained() > 0) {
-		for(auto i = 0; i < this->starList.size(); i++) {
-			if (this->starList[i] && !this->isContained(this->starList[i])) {
-				this->parent->insertToParent(this->starList[i]);
-				this->starList.erase(this->starList.begin() + i);
-				i--;
-			}
-		}
-	}
-	for(auto &it: this->quadrantList) {
-		if (it) {
-			it->adjustQuadrant();
-		}
-	}
-}
-
-double Quadrant::getCenterMassX() const
-{
-	return this->centerMassX;
-}
-double Quadrant::getCenterMassY() const
-{
-	return centerMassY;
-}
-double Quadrant::getMass() const
-{
-	return mass;
-}
-
-const std::vector<std::shared_ptr<Star>> &Quadrant::getContainedStarList() const
-{
-	return this->starList;
-}
-
-const std::vector<std::shared_ptr<Quadrant>> &Quadrant::getQuadrantList() const
-{
-	return this->quadrantList;
-}
-
-double Quadrant::getX() const
-{
-	return x;
-}
-double Quadrant::getY() const
-{
-	return y;
+	for (auto &it: vec)
+		this->addToStarList(it);
 }
 void Quadrant::addToStarList(std::shared_ptr<Star> &star)
 {
-	this->starList.emplace_back(star);
+	this->_starList.emplace_back(std::move(star));
 }
 
-double Quadrant::getLength() const
+const Quadrant::QuadrantContainer &Quadrant::get_links() const
 {
-	return length;
-}
-
-unsigned long Quadrant::getNumberOfStarsContained() const
-{
-	return (this->starList.size());
-}
-std::vector<std::shared_ptr<Star>> &Quadrant::getRawStarList()
-{
-	return (this->starList);
-}
-bool Quadrant::isContained(std::shared_ptr<Star> &star)
-{
-	return !(star->getX() < this->getX() || star->getX() > this->getX() + this->getLength() || star->getY() < this->getY() || star->getY() > this->getY() + this->getLength());
-}
-
-bool Quadrant::isLeafNode()
-{
-	for(auto &i : this->quadrantList) {
-		if (i)
-			return this->getNumberOfStarsContained() == 1;
-	}
-	return false;
+	return _links;
 }

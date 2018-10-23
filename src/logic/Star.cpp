@@ -1,45 +1,30 @@
 //
-// Created by Clément Péau on 2018-09-25.
+// Created by Clément Péau on 2018-10-20.
 //
 
-#include <utility>
-#include <logic/Star.hpp>
 #include <iostream>
+#include <logic/Star.hpp>
+#include "../../inc/logic/Star.hpp"
 
-Star::~Star()
+Star::Star(double x, double y, double mass)
 {
-	std::cout << "A star died" << std::endl;
-}
-double Star::getX() const
-{
-	return x;
-}
-
-void Star::setX(double x)
-{
-	Star::x = x;
-}
-double Star::getY() const
-{
-	return y;
-}
-void Star::setY(double y)
-{
-	Star::y = y;
-}
-double Star::getWeight() const
-{
-	return mass;
-}
-void Star::setWeight(double weight)
-{
-	Star::mass = weight;
+	setY(y);
+	setX(x);
+	setWidth(0);
+	setHeight(0);
+	setAccx(0);
+	setAccy(0);
+	setCmy(0);
+	setCmx(0);
+	setMass(mass);
 }
 
-Star::Star(double x, double y, int weight) : x(x), y(y), mass(weight)
-{}
-
-std::pair<double, double> Star::getPosition() const
+Star::Star(const Star &star)
 {
-	return std::make_pair<double, double>(this->getX(), this->getY());
+	setX(star.getX());
+	setY(star.getY());
+	setMass(star.getMass());
 }
+
+
+

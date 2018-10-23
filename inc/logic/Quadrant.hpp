@@ -1,67 +1,75 @@
-//
-// Created by Clément Péau on 2018-09-25.
-//
-
 #ifndef MULTICOREGALAXY_QUADRANT_HPP
 #define MULTICOREGALAXY_QUADRANT_HPP
 #include <vector>
-#include "Star.hpp"
+#include <memory>
+#include <tbb/task_group.h>
+#include "logic/Star.hpp"
+#include "utils/SpacialInformations.hpp"
 
-enum QuadrantPosition {
-	NorthWest = 0,
-	NorthEast = 1,
-	SouthWest = 2,
-	SouthEast = 3,
-	None = -1
-};
-
-#define SOFTENER 0.1*0.1
 #define THETA 0.5
-#define G 0.1
-class Quadrant
-{
-public:
-	//SubQuad Constructor
-	Quadrant(double x, double y, double length, QuadrantPosition &position, Quadrant *quadrant);
-	//RootQuad Constructor
-	Quadrant(double length);
-	
-	QuadrantPosition getPosition(Star &star) const;
-	const std::vector<std::shared_ptr<Star>> &getContainedStarList() const;
-	std::vector<std::shared_ptr<Star>> &getRawStarList();
-	const std::vector<std::shared_ptr<Quadrant>> &getQuadrantList() const;
-	
-	void insertToParent(std::shared_ptr<Star> &star);
-	void adjustQuadrant();
-	void insertToNode(std::shared_ptr<Star> & star);
-	void computeMassOfQuadrant();
-	
-	double getLength() const;
-	double getX() const;
-	double getY() const;
-	double getCenterMassX() const;
-	double getCenterMassY() const;
-	double getMass() const;
-	bool isContained(std::shared_ptr<Star> &star);
-	
-	std::pair<double,double> computeTreeForce(std::shared_ptr<Star> star) const;
-	std::pair<double, double> computeAcceleration(std::shared_ptr<Star> star1, std::shared_ptr<Star> star2) const;
+#define G 0.0000066742
+#define SOFTENER 1000
 
-private:
-	double length;
-	double x;
-	double y;
-	double centerMassX;
-	double centerMassY;
-	double mass;
-	Quadrant *parent;
-	
+class Quadrant : public SpacialInformations {
+	//Had to put the helper class inside the main class due to circular
+	// inclusion problems, the code file is still
+	// logic/QuadrantContainer.cpp
+	class QuadrantContainer {
+	public:
+		enum QuadrantPosition {
+			NorthWest = 0,
+			NorthEast = 1,
+			SouthWest = 2,
+			SouthEast = 3,
+			None = -1
+		};
+		QuadrantContainer(Quadrant &parent);
+		~QuadrantContainer();
+		void insertToNode(std::vector<std::shared_ptr<Star>> &starList);
+		void insertToNode(std::shared_ptr<Star> &star);
+		void balance();
+		
+		
+		void createQuadrantAtPosition(QuadrantPosition &pos);
+		std::shared_ptr<class Quadrant> getQuadrantAtPosition(QuadrantPosition &pos);
+		std::shared_ptr<class Quadrant> getOrCreateQuadrantAtPosition(QuadrantPosition &pos);
+		QuadrantContainer(class QuadrantContainer &quadrantContainer) = default;
+		bool isLeaf();
+		bool isUseless();
+		void clearLinks();
+	private:
+	public:
+		const std::vector<std::shared_ptr<Quadrant>> &
+		get_quadrantList() const;
+	private:
+		class Quadrant	&_containerQuadrant;
+		std::vector<std::shared_ptr<class Quadrant>> _quadrantList;
+	};
+
+
+public:
+	Quadrant(double x, double y, double size, Quadrant *parent);
+	~Quadrant() = default;
+	Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos);
+	void simulationLoop(tbb::task_group &gr, std::vector<std::shared_ptr<Star>> star, Quadrant &rc);
 	void addToStarList(std::shared_ptr<Star> &star);
-	unsigned long getNumberOfStarsContained() const;
+	void addToStarList(std::vector<std::shared_ptr<Star>> vec);
+	void balance();
+	void computeMassOfQuadrant();
+	std::pair<double, double> computeAcceleration(std::shared_ptr<Star> star1, std::shared_ptr<Star> star2) const;
+	const QuadrantContainer &get_links() const;
+	QuadrantContainer::QuadrantPosition getPosition(Star &star) const;
+private:
+	std::vector<std::shared_ptr<Star>> _starList;
+	class QuadrantContainer _links;
+	class Quadrant *parent;
 	
-	std::vector<std::shared_ptr<Quadrant>>	quadrantList;
-	std::vector<std::shared_ptr<Star>>	starList;
-	std::shared_ptr<Quadrant> getOrCreateSubQuadrant(std::shared_ptr<Star> &star);
-	bool isLeafNode();
+	bool isLeaf();
+	bool isNotContained(std::shared_ptr<Star> &shared_ptr);
+	void insertToParentNodeRec(std::shared_ptr<Star> &shared_ptr);
+	void verifyUselessQuadrant();
 };
-#endif //MULTICOREGALAXY_QUADRANT_HPP
+
+std::pair<double, double> computeTreeForce(Quadrant &quad, std::shared_ptr<Star> &star, double softener, double theta, double g);
+
+#endif
