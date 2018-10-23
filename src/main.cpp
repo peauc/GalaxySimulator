@@ -9,14 +9,15 @@
 
 int main(int ac, char **av) {
 	std::cout << "Start of the main thread" << '\n';
+	//Set the number of thread to 300
 	tbb::task_scheduler_init init(300);
-	std::srand(static_cast<unsigned int>(std::time(0)));
+	
+	//Set the random seed
+	std::srand(static_cast<unsigned int>(std::time(nullptr)));
+	
+	//Create a vector of shared_ptr<Star>, this allow us to fit the stars into the quadtree while still having a strong reference on them
 	std::vector<std::shared_ptr<Star>> vec;
-	{
-		auto center_star = std::make_shared<Star>(500, 500,
-							  70000);
-		vec.emplace_back(center_star);
-	}
+	vec.emplace_back(std::make_shared<Star>(500, 500, 70000));
 	for(int i = 0; i < 500; ++i) {
 		vec.emplace_back(std::make_shared<Star>(
 			250 + std::rand() % 500,
@@ -30,7 +31,6 @@ int main(int ac, char **av) {
 	rq->simulationLoop(g);
 	auto d = Display(1000, rq, vec);
 	d.init(ac, av, g);
-	g.wait();
 	std::cout << "End of the main thread" << std::endl;
 	return (0);
 }

@@ -7,6 +7,7 @@
 #include <GLUT/glut.h>
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
+#include <thread>
 #include "display/Display.hpp"
 #import "logic/Quadrant.hpp"
 
@@ -57,6 +58,7 @@ void Display::drawQuadrants(std::shared_ptr<RootQuadrant> &rc) {
 
 void Display::render()
 {
+	auto _beginFrame = std::chrono::system_clock::now();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -68,6 +70,13 @@ void Display::render()
 	glFlush();
 	glutSwapBuffers();
 	glutPostRedisplay();
+	auto _endFrame = std::chrono::system_clock::now();
+	auto _deltaTime = _endFrame - _beginFrame;
+	if (_deltaTime.count() < 1000.0 / 30) {
+		std::chrono::duration<double, std::milli> timeDelta(1000.0f / 30.0f - _deltaTime.count());
+		auto timeToWait = std::chrono::duration_cast<std::chrono::milliseconds>(timeDelta);
+		std::this_thread::sleep_for(std::chrono::milliseconds(timeToWait));
+	}
 }
 
 void Display::init(int argc, char **argv, tbb::task_group &g)
@@ -83,6 +92,7 @@ void Display::init(int argc, char **argv, tbb::task_group &g)
 		glutDisplayFunc(Display::render);
 		glutMainLoop();
 	});
+	g.wait();
 }
 
 
