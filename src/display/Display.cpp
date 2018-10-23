@@ -5,6 +5,8 @@
 
 #include <iostream>
 #include <GLUT/glut.h>
+#include <tbb/blocked_range.h>
+#include <tbb/parallel_for.h>
 #include "display/Display.hpp"
 #import "logic/Quadrant.hpp"
 
@@ -47,49 +49,40 @@ void Display::drawQuadrantsRec(class Quadrant &rq)
 	}
 }
 
-void Display::drawQuadrants() {
+void Display::drawQuadrants(std::shared_ptr<RootQuadrant> &rc) {
 	glLineWidth(0.2);
 	glColor3f(0.3, 0.3, 0.3);
-	drawQuadrantsRec(Quad->getRootQuadrant());
+	drawQuadrantsRec(rc->getRootQuadrant());
 }
 
 void Display::render()
 {
-	Quad->getRootQuadrant().computeMassOfQuadrant();
-	for(auto &it : Star) {
-		auto acc = Quad->getRootQuadrant().computeTreeForce(it);
-		it->setAccx(it->getAccx() + acc.first);
-		it->setAccy(it->getAccy() + acc.second);
-	}
-	for(auto &it: Star) {
-		it->setX(it->getX() + it->getAccx());
-		it->setY(it->getY() + it->getAccy());
-	}
-	Quad->getRootQuadrant().balance();
+	Quad->computeLock.unlock();
+	Quad->displayLock.lock();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, 1000.0, 1000.0, 0);
-	
-	drawQuadrants();
+	drawQuadrants(Quad);
 	drawPoints(Star);
 	glFlush();
 	glutSwapBuffers();
 	glutPostRedisplay();
 }
 
-void Display::init(int argc, char **argv)
+void Display::init(int argc, char **argv, tbb::task_group &g)
 {
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGB|GLUT_SINGLE);
-	glutInitWindowPosition(0,0);
-	glutInitWindowSize(this->size, this->size);
-	glutCreateWindow("Multicore Galaxies");
-	glutDisplayFunc(Display::render);
-	
-	glutMainLoop();
-	
-	
+	g.run([this, &argc, argv]()
+	{
+		int ac = 1;
+		glutInit(&ac, argv);
+		glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+		glutInitWindowPosition(0, 0);
+		glutInitWindowSize(this->size, this->size);
+		glutCreateWindow("Multicore Galaxies");
+		glutDisplayFunc(Display::render);
+		glutMainLoop();
+	});
 }
 
 

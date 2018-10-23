@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include "logic/Quadrant.hpp"
+#include "logic/RootQuadrant.hpp"
 #include <tbb/task.h>
 #include <tbb/task_group.h>
 #include <tbb/parallel_for.h>
@@ -134,37 +135,6 @@ void Quadrant::computeMassOfQuadrant()
 		this->setCmy(this->getCmy() / this->getMass());
 	}
 	
-}
-
-std::pair<double, double> Quadrant::computeTreeForce(std::shared_ptr<Star> star) const
-{
-	
-	double r, k, d;
-	auto acc = std::make_pair<double, double>(0, 0);
-	r = sqrt(pow(star->getX() - this->getCmx(), 2) +
-		 pow(star->getY() - this->getCmy(), 2) +
-		 SOFTENER);
-	d = this->getWidth();
-	if (d / r <= THETA) {
-		k = this->getMass() * G / (pow(r + 5, 3));
-		acc.first = k * (this->getCmx() - star->getX());
-		acc.second = k * (this->getCmy() - star->getY());
-		if (isnan(acc.first) || isnan(acc.second))
-			return (std::make_pair<double, double>(0, 0));
-	} else {
-		for(const auto &it : this->get_links().get_quadrantList()) {
-			if (it) {
-				auto tmp = it->computeTreeForce(star);
-				acc.first += tmp.first;
-				acc.second += tmp.second;
-				if (isnan(acc.first) ||
-				    isnan(acc.second))
-					return (std::make_pair<double, double>(
-						0, 0));
-			}
-		}
-	}
-	return acc;
 }
 
 bool Quadrant::isNotContained(std::shared_ptr<Star> &star)

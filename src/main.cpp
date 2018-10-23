@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <display/Display.hpp>
+#include <tbb/task_group.h>
 #include "logic/RootQuadrant.hpp"
 #include "logic/Star.hpp"
 
@@ -21,11 +22,16 @@ int main(int ac, char **av) {
 			250 + std::rand() % 500,
 			10000));
 	}
-	auto rq = std::make_shared<RootQuadrant>(1000);
+	auto rq = std::make_shared<RootQuadrant>(1000, vec);
 	rq->getRootQuadrant().addToStarList(vec);
 	rq->getRootQuadrant().balance();
+	rq->computeLock.lock();
+	rq->displayLock.lock();
+	tbb::task_group g;
+	rq->simulationLoop(g);
 	auto d = Display(1000, rq, vec);
-	d.init(ac, av);
+	d.init(ac, av, g);
+	g.wait();
 	std::cout << "End of the program" << std::endl;
 	return (0);
 }

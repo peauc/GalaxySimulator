@@ -2,6 +2,7 @@
 #define MULTICOREGALAXY_QUADRANT_HPP
 #include <vector>
 #include <memory>
+#include <tbb/task_group.h>
 #include "logic/Star.hpp"
 #include "utils/SpacialInformations.hpp"
 
@@ -50,11 +51,11 @@ public:
 	Quadrant(double x, double y, double size, Quadrant *parent);
 	~Quadrant() = default;
 	Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos);
+	void simulationLoop(tbb::task_group &gr, std::vector<std::shared_ptr<Star>> star, Quadrant &rc);
 	void addToStarList(std::shared_ptr<Star> &star);
 	void addToStarList(std::vector<std::shared_ptr<Star>> vec);
 	void balance();
 	void computeMassOfQuadrant();
-	std::pair<double, double> computeTreeForce(std::shared_ptr<Star> star) const;
 	std::pair<double, double> computeAcceleration(std::shared_ptr<Star> star1, std::shared_ptr<Star> star2) const;
 	const QuadrantContainer &get_links() const;
 	QuadrantContainer::QuadrantPosition getPosition(Star &star) const;
@@ -68,5 +69,7 @@ private:
 	void insertToParentNodeRec(std::shared_ptr<Star> &shared_ptr);
 	void verifyUselessQuadrant();
 };
+
+std::pair<double, double> computeTreeForce(Quadrant &quad, std::shared_ptr<Star> &star, double softener, double theta, double g);
 
 #endif
