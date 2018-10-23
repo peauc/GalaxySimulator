@@ -12,14 +12,14 @@ int main(int ac, char **av) {
 	std::vector<std::shared_ptr<Star>> vec;
 	{
 		auto center_star = std::make_shared<Star>(500, 500,
-							  500000);
+							  70000);
 		vec.emplace_back(center_star);
 	}
 	for(int i = 0; i < 100; ++i) {
 		vec.emplace_back(std::make_shared<Star>(
 			250 + std::rand() % 500,
 			250 + std::rand() % 500,
-			10));
+			10000));
 	}
 	auto rq = std::make_shared<RootQuadrant>(1000);
 	rq->getRootQuadrant().addToStarList(vec);

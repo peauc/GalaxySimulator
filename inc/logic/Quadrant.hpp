@@ -6,8 +6,8 @@
 #include "utils/SpacialInformations.hpp"
 
 #define THETA 0.5
-#define G 0.1
-#define SOFTENER 0.1*0.1
+#define G 0.0000066742
+#define SOFTENER 1000
 
 class Quadrant : public SpacialInformations {
 	//Had to put the helper class inside the main class due to circular

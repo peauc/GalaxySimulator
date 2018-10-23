@@ -10,12 +10,13 @@ Star::Star(double x, double y, double mass)
 {
 	setY(y);
 	setX(x);
+	setWidth(0);
+	setHeight(0);
+	setAccx(0);
+	setAccy(0);
+	setCmy(0);
+	setCmx(0);
 	setMass(mass);
-}
-
-Star::~Star()
-{
-	std::cout << "A star died" << std::endl;
 }
 
 Star::Star(const Star &star)

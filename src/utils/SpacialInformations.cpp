@@ -70,4 +70,20 @@ void SpacialInformations::setCmy(double _cmy)
 {
 	SpacialInformations::_cmy = _cmy;
 }
+double SpacialInformations::getAccx() const
+{
+	return _accx;
+}
+void SpacialInformations::setAccx(double _accx)
+{
+	SpacialInformations::_accx = _accx;
+}
+double SpacialInformations::getAccy() const
+{
+	return _accy;
+}
+void SpacialInformations::setAccy(double _accy)
+{
+	SpacialInformations::_accy = _accy;
+}
 

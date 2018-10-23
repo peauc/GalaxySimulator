@@ -5,7 +5,7 @@
 class Star : public SpacialInformations {
 public:
 	Star(double x, double y, double mass);
-	~Star();
+	~Star() = default;
 	
 	Star(const Star &star);
 private:

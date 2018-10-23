@@ -9,7 +9,6 @@ class SpacialInformations {
 public:
 	~SpacialInformations() = default;
 	
-	
 	double getX() const;
 	void setX(double x);
 	double getY() const;
@@ -24,14 +23,22 @@ public:
 	void setCmx(double _cmx);
 	double getCmy() const;
 	void setCmy(double _cmy);
+	double getAccx() const;
+	void setAccx(double _accx);
+	double getAccy() const;
+	void setAccy(double _accy);
+
 private:
 	double _cmx;
 	double _cmy;
 	double _height;
 	double _width;
+	double _accx;
+	double _accy;
 	double _x;
 	double _y;
 	double _mass;
+	
 protected:
 	SpacialInformations() = default;
 	SpacialInformations(SpacialInformations &spacialInformations);

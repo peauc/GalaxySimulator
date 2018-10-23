@@ -78,7 +78,7 @@ bool Quadrant::QuadrantContainer::isUseless()
 	bool ret = this->_containerQuadrant._starList.empty();
 	if (!this->isLeaf()) {
 		for (auto &it: this->_quadrantList) {
-			if (it && !it->_links.isUseless() && !it->_starList.empty())
+			if (it && (!it->_links.isUseless() || !it->_starList.empty()))
 				ret = false;
 		}
 	}

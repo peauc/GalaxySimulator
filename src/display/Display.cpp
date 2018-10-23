@@ -58,8 +58,12 @@ void Display::render()
 	Quad->getRootQuadrant().computeMassOfQuadrant();
 	for(auto &it : Star) {
 		auto acc = Quad->getRootQuadrant().computeTreeForce(it);
-		it->setX(it->getX() + acc.first);
-		it->setY(it->getY() + acc.second);
+		it->setAccx(it->getAccx() + acc.first);
+		it->setAccy(it->getAccy() + acc.second);
+	}
+	for(auto &it: Star) {
+		it->setX(it->getX() + it->getAccx());
+		it->setY(it->getY() + it->getAccy());
 	}
 	Quad->getRootQuadrant().balance();
 	glClear(GL_COLOR_BUFFER_BIT);

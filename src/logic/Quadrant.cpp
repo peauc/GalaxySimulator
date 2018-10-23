@@ -4,9 +4,19 @@
 
 #include <cmath>
 #include "logic/Quadrant.hpp"
+#include <tbb/task.h>
+#include <tbb/task_group.h>
+#include <tbb/parallel_for.h>
 
 Quadrant::Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos) : _links(*this), parent(quadrant)
 {
+	this->setX(0);
+	this->setY(0);
+	this->setAccy(0);
+	this->setAccx(0);
+	this->setCmx(0);
+	this->setMass(0);
+	this->setCmy(0);
 	this->setWidth(quadrant->getWidth() / 2);
 	this->setHeight(quadrant->getWidth() / 2);
 	if (pos == QuadrantContainer::QuadrantPosition::NorthEast || pos == QuadrantContainer::QuadrantPosition::NorthWest)
@@ -24,6 +34,10 @@ Quadrant::Quadrant(double x, double y, double size, Quadrant *parent) :
 {
 	this->setX(x);
 	this->setY(y);
+	this->setAccy(0);
+	this->setAccx(0);
+	this->setCmx(0);
+	this->setCmy(0);
 	this->setHeight(size);
 	this->setWidth(size);
 	this->setMass(0);
@@ -62,20 +76,26 @@ void Quadrant::balance()
 		if (this->isNotContained(this->_starList[i])) {
 			if (this->parent) {
 				this->parent->insertToParentNodeRec(this->_starList[i]);
+				this->_starList.erase(
+					this->_starList.begin() + i);
+				--i;
+				
 			} // Out of the screen
-			this->_starList.erase(this->_starList.begin() + i);
-			--i;
+			else {
+				this->_starList.erase(this->_starList.begin() + i);
+				--i;
+			}
 		}
 	}
 	if (this->getWidth() / 2 > 1) {
-		if (!this->_starList.empty()){
+		if (this->_starList.size() > 1){
 			this->_links.insertToNode(this->_starList);
 			this->_starList.clear();
 		}
 	}
 	if (!this->isLeaf()) {
 		this->_links.balance();
-		//this->verifyUselessQuadrant();
+		this->verifyUselessQuadrant();
 	}
 }
 
@@ -96,7 +116,7 @@ void Quadrant::computeMassOfQuadrant()
 		auto star = this->_starList.front();
 		this->setCmx(star->getX());
 		this->setCmy(star->getY());
-		setMass(star->getMass());
+		this->setMass(star->getMass());
 	} else {
 		this->setMass(0);
 		this->setCmy(0);
@@ -118,41 +138,33 @@ void Quadrant::computeMassOfQuadrant()
 
 std::pair<double, double> Quadrant::computeTreeForce(std::shared_ptr<Star> star) const
 {
-	double r,k,d;
-	auto acc = std::make_pair<double,double>(0, 0);
 	
-	r = sqrt((star->getX() - this->getCmx()) * (star->getX() - this->getCmx()) +
-		 (star->getY() - this->getCmy()) * (star->getY() - this->getCmy()));
+	double r, k, d;
+	auto acc = std::make_pair<double, double>(0, 0);
+	r = sqrt(pow(star->getX() - this->getCmx(), 2) +
+		 pow(star->getY() - this->getCmy(), 2) +
+		 SOFTENER);
 	d = this->getWidth();
-	if (d/r <= THETA) {
-		k = this->getMass() * G / (r*r*r);
-		acc.first =k * (this->getCmx() - star->getX());
+	if (d / r <= THETA) {
+		k = this->getMass() * G / (pow(r + 5, 3));
+		acc.first = k * (this->getCmx() - star->getX());
 		acc.second = k * (this->getCmy() - star->getY());
+		if (isnan(acc.first) || isnan(acc.second))
+			return (std::make_pair<double, double>(0, 0));
 	} else {
 		for(const auto &it : this->get_links().get_quadrantList()) {
 			if (it) {
 				auto tmp = it->computeTreeForce(star);
 				acc.first += tmp.first;
 				acc.second += tmp.second;
+				if (isnan(acc.first) ||
+				    isnan(acc.second))
+					return (std::make_pair<double, double>(
+						0, 0));
 			}
 		}
 	}
-	
-	
 	return acc;
-}
-
-std::pair<double, double> Quadrant::computeAcceleration(std::shared_ptr<Star> star1, std::shared_ptr<Star> star2) const
-{
-	auto ret = std::make_pair<double, double>(0, 0);
-	
-	if ((&star1 == &star2) || (star1->getY() == star2->getY() && star1->getX() == star2->getX()))
-		return ret;
-	double r = sqrt((star1->getX() - star2->getX()) * (star1->getX() - star2->getX()) + (star1->getY() - star2->getY()) * (star1->getY() - star2->getY()));
-	double k = G * star1->getMass() / (r*r*r);
-	ret.first = k * (star2->getX() - star1->getX());
-	ret.second = k * (star2->getY() - star1->getY());
-	return (ret);
 }
 
 bool Quadrant::isNotContained(std::shared_ptr<Star> &star)
