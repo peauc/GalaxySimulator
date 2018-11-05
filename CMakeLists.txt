@@ -39,7 +39,5 @@ add_executable(MulticoreGalaxy
         ${UTILS_SOURCE} ${UTILS_INCLUDE}
         ${DISPLAY_SOURCE} ${DISPLAY_INCLUDE}
         src/main.cpp)
-message("HELLO")
-message(${LINK})
 target_link_libraries(MulticoreGalaxy ${LINK} tbb)
 target_include_directories(MulticoreGalaxy PRIVATE ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIR} ${GLM_INCLUDE_DIR} ${GLUT_INCLUDE_DIRS} /usr/local/include)
