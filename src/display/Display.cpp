@@ -4,8 +4,12 @@
 #define GL_SILENCE_DEPRECATION
 
 #include <iostream>
-#include <GL/gl.h>
-#include <GL/glut.h>
+#ifdef APPLE
+	#include <GLUT/glut.h>
+#else
+	#include <GL/glut.h>
+#endif
+
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
 #include <thread>
