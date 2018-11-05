@@ -4,12 +4,13 @@
 #define GL_SILENCE_DEPRECATION
 
 #include <iostream>
-#include <GLUT/glut.h>
+#include <GL/gl.h>
+#include <GL/glut.h>
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
 #include <thread>
 #include "display/Display.hpp"
-#import "logic/Quadrant.hpp"
+#include "logic/Quadrant.hpp"
 
 std::shared_ptr<RootQuadrant> Quad;
 std::vector<std::shared_ptr<Star>> Star;

@@ -19,8 +19,8 @@ public:
 
 private:
 	int size;
-	std::shared_ptr<Quadrant> Quadrant;
-	static void drawPoints(const std::vector<std::shared_ptr<Star>> &vector);
+	std::shared_ptr<class Quadrant> Quadrant;
+	static void drawPoints(const std::vector<std::shared_ptr<class Star>> &vector);
 };
 
 #endif //MULTICOREGALAXY_DISPLAY_HPP

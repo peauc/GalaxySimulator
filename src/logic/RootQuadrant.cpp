@@ -65,7 +65,7 @@ std::pair<double, double> computeTreeForce(Quadrant &quad, std::shared_ptr<Star>
 		k = quad.getMass() * g / (pow(r + 5, 3));
 		acc.first = k * (quad.getCmx() - star->getX());
 		acc.second = k * (quad.getCmy() - star->getY());
-		if (isnan(acc.first) || isnan(acc.second))
+		if (std::isnan(acc.first) || std::isnan(acc.second))
 			return (std::make_pair<double, double>(0, 0));
 	} else {
 		for(const auto &it : quad.get_links().get_quadrantList()) {
@@ -73,8 +73,8 @@ std::pair<double, double> computeTreeForce(Quadrant &quad, std::shared_ptr<Star>
 				auto tmp = computeTreeForce(*it ,star, softener, theta, g);
 				acc.first += tmp.first;
 				acc.second += tmp.second;
-				if (isnan(acc.first) ||
-				    isnan(acc.second))
+				if (std::isnan(acc.first) ||
+				    std::isnan(acc.second))
 					return (std::make_pair<double, double>(
 						0, 0));
 			}
