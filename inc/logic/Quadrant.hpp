@@ -25,8 +25,8 @@ class Quadrant : public SpacialInformations {
 		};
 		QuadrantContainer(Quadrant &parent);
 		~QuadrantContainer();
-		void insertToNode(std::vector<std::shared_ptr<Star>> &starList);
-		void insertToNode(std::shared_ptr<Star> &star);
+		void insertToNode(std::vector<std::shared_ptr<class Star>> &starList);
+		void insertToNode(std::shared_ptr<class Star> &star);
 		void balance();
 		
 		
@@ -51,25 +51,25 @@ public:
 	Quadrant(double x, double y, double size, Quadrant *parent);
 	~Quadrant() = default;
 	Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos);
-	void simulationLoop(tbb::task_group &gr, std::vector<std::shared_ptr<Star>> star, Quadrant &rc);
-	void addToStarList(std::shared_ptr<Star> &star);
-	void addToStarList(std::vector<std::shared_ptr<Star>> vec);
+	void simulationLoop(tbb::task_group &gr, std::vector<std::shared_ptr<class Star>> star, Quadrant &rc);
+	void addToStarList(std::shared_ptr<class Star> &star);
+	void addToStarList(std::vector<std::shared_ptr<class Star>> vec);
 	void balance();
 	void computeMassOfQuadrant();
-	std::pair<double, double> computeAcceleration(std::shared_ptr<Star> star1, std::shared_ptr<Star> star2) const;
+	std::pair<double, double> computeAcceleration(std::shared_ptr<class Star> star1, std::shared_ptr<class Star> star2) const;
 	const QuadrantContainer &get_links() const;
-	QuadrantContainer::QuadrantPosition getPosition(Star &star) const;
+	QuadrantContainer::QuadrantPosition getPosition(class Star &star) const;
 private:
-	std::vector<std::shared_ptr<Star>> _starList;
+	std::vector<std::shared_ptr<class Star>> _starList;
 	class QuadrantContainer _links;
 	class Quadrant *parent;
 	
 	bool isLeaf();
-	bool isNotContained(std::shared_ptr<Star> &shared_ptr);
-	void insertToParentNodeRec(std::shared_ptr<Star> &shared_ptr);
+	bool isNotContained(std::shared_ptr<class Star> &shared_ptr);
+	void insertToParentNodeRec(std::shared_ptr<class Star> &shared_ptr);
 	void verifyUselessQuadrant();
 };
 
-std::pair<double, double> computeTreeForce(Quadrant &quad, std::shared_ptr<Star> &star, double softener, double theta, double g);
+std::pair<double, double> computeTreeForce(Quadrant &quad, std::shared_ptr<class Star> &star, double softener, double theta, double g);
 
 #endif

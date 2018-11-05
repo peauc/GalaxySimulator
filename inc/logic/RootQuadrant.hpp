@@ -5,7 +5,7 @@
 
 class RootQuadrant{
 public:
-	RootQuadrant(double size, std::vector<std::shared_ptr<Star>> &vec);
+	RootQuadrant(double size, std::vector<std::shared_ptr<class Star>> &vec);
 	~RootQuadrant() = default;
 	void simulationLoop(tbb::task_group &gr);
 	std::mutex computeLock;
@@ -13,7 +13,7 @@ public:
 	RootQuadrant(RootQuadrant &rootQuadrant) = default;
 	Quadrant &getRootQuadrant();
 private:
-	std::vector<std::shared_ptr<Star>> _starVector;
+	std::vector<std::shared_ptr<class Star>> _starVector;
 	Quadrant _rootQuadrant;
 };
 
