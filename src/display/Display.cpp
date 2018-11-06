@@ -64,14 +64,13 @@ void Display::drawQuadrants(std::shared_ptr<RootQuadrant> &rc) {
 void Display::render()
 {
 	auto _beginFrame = std::chrono::system_clock::now();
+	Quad->simulationLoop();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, 1000.0, 1000.0, 0);
-	Quad->computeLock.lock();
 	drawQuadrants(Quad);
 	drawPoints(Star);
-	Quad->computeLock.unlock();
 	glFlush();
 	glutSwapBuffers();
 	glutPostRedisplay();
@@ -84,20 +83,16 @@ void Display::render()
 	}
 }
 
-void Display::init(int argc, char **argv, tbb::task_group &g)
+void Display::init(int argc, char **argv)
 {
-	g.run([this, &argc, argv]()
-	{
-		int ac = 1;
-		glutInit(&ac, argv);
-		glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
-		glutInitWindowPosition(0, 0);
-		glutInitWindowSize(this->size, this->size);
-		glutCreateWindow("Multicore Galaxies");
-		glutDisplayFunc(Display::render);
-		glutMainLoop();
-	});
-	g.wait();
+	int ac = 1;
+	glutInit(&ac, argv);
+	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(this->size, this->size);
+	glutCreateWindow("Multicore Galaxies");
+	glutDisplayFunc(Display::render);
+	glutMainLoop();
 }
 
 

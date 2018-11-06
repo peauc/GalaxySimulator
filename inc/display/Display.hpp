@@ -12,7 +12,7 @@
 class Display {
 public:
 	Display(int size, std::shared_ptr<RootQuadrant> &rq, std::vector<std::shared_ptr<Star>> &star);
-	void init(int arc, char **argv, tbb::task_group &g);
+	void init(int arc, char **argv);
 	static void render();
 	static void drawQuadrants(std::shared_ptr<RootQuadrant> &rc);
 	static void drawQuadrantsRec(Quadrant &rq);

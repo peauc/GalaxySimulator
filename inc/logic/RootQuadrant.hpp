@@ -7,7 +7,7 @@ class RootQuadrant{
 public:
 	RootQuadrant(double size, std::vector<std::shared_ptr<Star>> &vec);
 	~RootQuadrant() = default;
-	void simulationLoop(tbb::task_group &gr);
+	void simulationLoop();
 	std::mutex computeLock;
 	
 	RootQuadrant(RootQuadrant &rootQuadrant) = default;

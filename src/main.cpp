@@ -9,8 +9,6 @@
 
 int main(int ac, char **av) {
 	std::cout << "Start of the main thread" << '\n';
-	//Set the number of thread to 300
-	tbb::task_scheduler_init init(300);
 	
 	//Set the random seed
 	std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -27,10 +25,9 @@ int main(int ac, char **av) {
 	auto rq = std::make_shared<RootQuadrant>(1000, vec);
 	rq->getRootQuadrant().addToStarList(vec);
 	rq->getRootQuadrant().balance();
-	tbb::task_group g;
-	rq->simulationLoop(g);
+	rq->simulationLoop();
 	auto d = Display(1000, rq, vec);
-	d.init(ac, av, g);
+	d.init(ac, av);
 	std::cout << "End of the main thread" << std::endl;
 	return (0);
 }

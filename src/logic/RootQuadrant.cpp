@@ -17,38 +17,22 @@ RootQuadrant::RootQuadrant(double size, std::vector<std::shared_ptr<Star>> &vec)
 {
 }
 
-void RootQuadrant::simulationLoop(tbb::task_group &gr)
+void RootQuadrant::simulationLoop()
 {
-	gr.run([this]()
-	       {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
-		       while (true) {
-			       computeLock.lock();
-			       _rootQuadrant.computeMassOfQuadrant();
-			       //calculate the accel
-			       tbb::parallel_for(
-				       tbb::blocked_range<size_t>(0, this->_starVector.size()), [this](const tbb::blocked_range<size_t> &it)
-				       {
-					       for(size_t i = it.begin(); i < it.end(); i++) {
-						       auto acc = computeTreeForce(this->getRootQuadrant(), this->_starVector[i], SOFTENER, THETA, G);
-						       this->_starVector[i]->setAccx(this->_starVector[i]->getAccx() + acc.first);
-						       this->_starVector[i]->setAccy(this->_starVector[i]->getAccy() + acc.second);
-					       }
-				       });
-			       //apply the accel
-			       tbb::parallel_for(tbb::blocked_range<size_t>(0, this->_starVector.size()), [this](const tbb::blocked_range<size_t> &it)
-			       {
-				       for(size_t i = it.begin(); i < it.end(); i++) {
-					       this->_starVector[i]->setX(this->_starVector[i]->getX() + this->_starVector[i]->getAccx());
-					       this->_starVector[i]->setY(this->_starVector[i]->getY() + this->_starVector[i]->getAccy());
-				       }
-			       });
-			       _rootQuadrant.balance();
-			       computeLock.unlock();
-		       }
-#pragma clang diagnostic pop
-	       });
+	_rootQuadrant.computeMassOfQuadrant();
+	//calculate the accel
+	
+	for(auto &it: this->_starVector) {
+		auto acc = computeTreeForce(this->getRootQuadrant(), it, SOFTENER, THETA, G);
+		it->setAccx(it->getAccx() + acc.first);
+		it->setAccy(it->getAccy() + acc.second);
+	}
+	for (auto &it: this->_starVector) {
+		it->setX(it->getX() + it->getAccx());
+		it->setY(it->getY() + it->getAccy());
+	}
+	
+	_rootQuadrant.balance();
 }
 
 //Function to call for processing
