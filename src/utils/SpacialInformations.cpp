@@ -2,7 +2,8 @@
 // Created by Clément Péau on 2018-10-20.
 //
 
-#include "utils/SpacialInformations.hpp"
+#include <utils/SpacialInformations.hpp>
+#import "utils/SpacialInformations.hpp"
 
 SpacialInformations::SpacialInformations(SpacialInformations &spacialInformations)
 {

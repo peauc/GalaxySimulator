@@ -35,7 +35,7 @@ file(GLOB_RECURSE DISPLAY_SOURCE
         src/display/*.cpp)
 file(GLOB_RECURSE DISPLAY_INCLUDE
         inc/display/*.hpp)
-message(${LINK})
+
 link_directories("/usr/local/lib/")
 add_executable(MulticoreGalaxy
         ${LOGIC_SOURCE} ${LOGIC_INCLUDE}

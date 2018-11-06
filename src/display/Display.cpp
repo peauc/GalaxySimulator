@@ -14,7 +14,7 @@
 #include <tbb/parallel_for.h>
 #include <thread>
 #include "display/Display.hpp"
-#include "logic/Quadrant.hpp"
+#import "logic/Quadrant.hpp"
 
 std::shared_ptr<RootQuadrant> Quad;
 std::vector<std::shared_ptr<Star>> Star;
