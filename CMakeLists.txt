@@ -15,7 +15,10 @@ if (APPLE)
     add_compile_definitions(APPLE)
     set(LINK ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_gl_LIBRARY} ${GLUT_LIBRARY})
 else()
-    set(LINK glut GLU GL GLEW)
+    set(LINK "glut"
+            "GLU"
+            "GL"
+            "GLEW")
 endif()
 
 file(GLOB_RECURSE UTILS_SOURCE
@@ -32,12 +35,12 @@ file(GLOB_RECURSE DISPLAY_SOURCE
         src/display/*.cpp)
 file(GLOB_RECURSE DISPLAY_INCLUDE
         inc/display/*.hpp)
-
+message(${LINK})
 link_directories("/usr/local/lib/")
 add_executable(MulticoreGalaxy
         ${LOGIC_SOURCE} ${LOGIC_INCLUDE}
         ${UTILS_SOURCE} ${UTILS_INCLUDE}
         ${DISPLAY_SOURCE} ${DISPLAY_INCLUDE}
         src/main.cpp)
-target_link_libraries(MulticoreGalaxy ${LINK} tbb)
+target_link_libraries(MulticoreGalaxy ${LINK})
 target_include_directories(MulticoreGalaxy PRIVATE ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIR} ${GLM_INCLUDE_DIR} ${GLUT_INCLUDE_DIRS} /usr/local/include)
