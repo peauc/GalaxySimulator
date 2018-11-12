@@ -6,9 +6,6 @@
 #include "logic/Star.hpp"
 #include "utils/SpacialInformations.hpp"
 
-#define THETA 0.5
-#define G 0.0000066742
-#define SOFTENER 1000
 
 class Quadrant : public SpacialInformations {
 	//Had to put the helper class inside the main class due to circular
@@ -23,8 +20,11 @@ class Quadrant : public SpacialInformations {
 			SouthEast = 3,
 			None = -1
 		};
+		QuadrantContainer();
 		QuadrantContainer(Quadrant &parent);
+		QuadrantContainer(const QuadrantContainer &quadrant);
 		~QuadrantContainer();
+		QuadrantContainer &operator=(const QuadrantContainer &quad);
 		void insertToNode(std::vector<std::shared_ptr<Star>> &starList);
 		void insertToNode(std::shared_ptr<Star> &star);
 		void balance();
@@ -37,10 +37,9 @@ class Quadrant : public SpacialInformations {
 		bool isLeaf();
 		bool isUseless();
 		void clearLinks();
-	private:
-	public:
 		const std::vector<std::shared_ptr<Quadrant>> &
 		get_quadrantList() const;
+		std::vector<std::shared_ptr<Quadrant>> getQuadrantList();
 	private:
 		class Quadrant	&_containerQuadrant;
 		std::vector<std::shared_ptr<class Quadrant>> _quadrantList;
@@ -48,7 +47,11 @@ class Quadrant : public SpacialInformations {
 
 
 public:
+	Quadrant();
 	Quadrant(double x, double y, double size, Quadrant *parent);
+	Quadrant(const Quadrant &quad);
+	Quadrant(Quadrant *quad);
+	Quadrant &operator=(const Quadrant &quad);
 	~Quadrant() = default;
 	Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos);
 	void simulationLoop(tbb::task_group &gr, std::vector<std::shared_ptr<Star>> star, Quadrant &rc);
@@ -58,6 +61,7 @@ public:
 	void computeMassOfQuadrant();
 	std::pair<double, double> computeAcceleration(std::shared_ptr<Star> star1, std::shared_ptr<Star> star2) const;
 	const QuadrantContainer &get_links() const;
+	 QuadrantContainer &getLinks();
 	QuadrantContainer::QuadrantPosition getPosition(Star &star) const;
 private:
 	std::vector<std::shared_ptr<Star>> _starList;

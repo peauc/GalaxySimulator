@@ -25,6 +25,18 @@ Star::Star(const Star &star)
 	setY(star.getY());
 	setMass(star.getMass());
 }
+Star::Star()
+{
+	setY(0);
+	setX(0);
+	setWidth(0);
+	setHeight(0);
+	setAccx(0);
+	setAccy(0);
+	setCmy(0);
+	setCmx(0);
+	setMass(0);
+}
 
 
 

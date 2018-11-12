@@ -12,6 +12,10 @@ SpacialInformations::SpacialInformations(SpacialInformations &spacialInformation
 	_mass = spacialInformations.getMass();
 	_height = spacialInformations.getHeight();
 	_width = spacialInformations.getWidth();
+	_accx = spacialInformations.getAccx();
+	_accy = spacialInformations.getAccy();
+	_cmx = spacialInformations.getCmx();
+	_cmy = spacialInformations.getCmy();
 }
 
 double SpacialInformations::getX() const
@@ -85,5 +89,31 @@ double SpacialInformations::getAccy() const
 void SpacialInformations::setAccy(double _accy)
 {
 	SpacialInformations::_accy = _accy;
+}
+SpacialInformations &
+SpacialInformations::operator =(const SpacialInformations &spacialInformations)
+{
+	_x = spacialInformations.getX();
+	_y = spacialInformations.getY();
+	_mass = spacialInformations.getMass();
+	_height = spacialInformations.getHeight();
+	_width = spacialInformations.getWidth();
+	_accx = spacialInformations.getAccx();
+	_accy = spacialInformations.getAccy();
+	_cmx = spacialInformations.getCmx();
+	_cmy = spacialInformations.getCmy();
+}
+SpacialInformations::SpacialInformations()
+{
+	_x = 0;
+	_y = 0;
+	_mass = 0;
+	_height = 0;
+	_width = 0;
+	_accx = 0;
+	_accy = 0;
+	_cmx = 0;
+	_cmy = 0;
+	
 }
 

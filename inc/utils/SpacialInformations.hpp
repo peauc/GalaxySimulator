@@ -7,6 +7,9 @@
 
 class SpacialInformations {
 public:
+	SpacialInformations();
+	SpacialInformations(SpacialInformations &spacialInformations);
+	SpacialInformations &operator=(const SpacialInformations &spacialInformations);
 	~SpacialInformations() = default;
 	
 	double getX() const;
@@ -28,7 +31,6 @@ public:
 	double getAccy() const;
 	void setAccy(double _accy);
 
-private:
 	double _cmx;
 	double _cmy;
 	double _height;
@@ -38,9 +40,5 @@ private:
 	double _x;
 	double _y;
 	double _mass;
-	
-protected:
-	SpacialInformations() = default;
-	SpacialInformations(SpacialInformations &spacialInformations);
 };
 #endif //MULTICOREGALAXY_IPOSITION_HPP

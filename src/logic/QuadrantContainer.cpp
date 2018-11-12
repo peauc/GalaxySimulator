@@ -90,4 +90,25 @@ void Quadrant::QuadrantContainer::clearLinks()
 		i = nullptr;
 	}
 }
+ std::vector<std::shared_ptr<Quadrant>> Quadrant::QuadrantContainer::getQuadrantList()
+{
+	return _quadrantList;
+}
+
+Quadrant::QuadrantContainer::QuadrantContainer(const QuadrantContainer &quadrant) : QuadrantContainer(quadrant._containerQuadrant)
+{
+	for(size_t i = 0; i < 4; i++) {
+		this->_quadrantList[i] = quadrant._quadrantList[i];
+	}
+}
+Quadrant::QuadrantContainer &
+Quadrant::QuadrantContainer::operator =(const Quadrant::QuadrantContainer &quad)
+{
+	_containerQuadrant = quad._containerQuadrant;
+	for(size_t i = 0; i < 4; i++) {
+		this->_quadrantList[i] = quad._quadrantList[i];
+	}
+	return (*this);
+}
+
 
