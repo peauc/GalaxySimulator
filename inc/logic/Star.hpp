@@ -10,6 +10,7 @@ public:
 	Star();
 	~Star() = default;
 	
+	unsigned int depth;
 	Star(const Star &star);
 private:
 };

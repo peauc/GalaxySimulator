@@ -11,6 +11,7 @@
 
 Quadrant::Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos) : SpacialInformations(), _links(*this), parent(quadrant)
 {
+	this->depth = 0;
 	this->setX(0);
 	this->setY(0);
 	this->setAccy(0);
@@ -31,11 +32,13 @@ Quadrant::Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition
 }
 
 Quadrant::Quadrant() : _links(*this), SpacialInformations() {
+	this->depth = 0;
 }
 
 Quadrant::Quadrant(double x, double y, double size, Quadrant *parent) : SpacialInformations(),
 	_links(*this)
 {
+	this->depth = 0;
 	this->setX(x);
 	this->setY(y);
 	this->setAccy(0);
@@ -202,4 +205,21 @@ Quadrant &Quadrant::operator =(const Quadrant &quadrant)
 	this->setY(quadrant.getY());
 	
 	return *this;
+}
+
+//Call each quadrant recursively on the host program and launch the kernel
+void Quadrant::computeAccelerationForQuadrant(Star *starList, unsigned long starSize, cl::Program *program, cl::Context *context, cl::Device *device, cl::CommandQueue &queue, cl::Buffer &d_starArray)
+{
+	cl::Kernel kernel_test = cl::Kernel(*program, "test1");
+	kernel_test.setArg(0, d_starArray);
+	queue.enqueueNDRangeKernel(kernel_test, cl::NullRange, cl::NDRange(5), cl::NullRange);
+	queue.finish();
+	//make kernel and start it
+	
+	//test1(starList, starSize, this, this->isLeaf());
+	for(auto &it: this->_links.get_quadrantList()) {
+		if (it) {
+			it->computeAccelerationForQuadrant(starList, starSize, program, context, device, queue, d_starArray);
+		}
+	}
 }

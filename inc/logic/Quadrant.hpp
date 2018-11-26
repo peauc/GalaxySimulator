@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <tbb/task_group.h>
+#include <OpenCL/cl.hpp>
 #include "logic/Star.hpp"
 #include "utils/SpacialInformations.hpp"
 
@@ -56,6 +57,7 @@ public:
 	Quadrant(class Quadrant *quadrant, QuadrantContainer::QuadrantPosition &pos);
 	void simulationLoop(tbb::task_group &gr, std::vector<std::shared_ptr<Star>> star, Quadrant &rc);
 	void addToStarList(std::shared_ptr<Star> &star);
+	void computeAccelerationForQuadrant(Star *pStar, unsigned long i, cl::Program *program, cl::Context *context, cl::Device *device, cl::CommandQueue &queue, cl::Buffer &d_array);
 	void addToStarList(std::vector<std::shared_ptr<Star>> vec);
 	void balance();
 	void computeMassOfQuadrant();
@@ -63,6 +65,7 @@ public:
 	const QuadrantContainer &get_links() const;
 	 QuadrantContainer &getLinks();
 	QuadrantContainer::QuadrantPosition getPosition(Star &star) const;
+	unsigned int depth;
 private:
 	std::vector<std::shared_ptr<Star>> _starList;
 	class QuadrantContainer _links;

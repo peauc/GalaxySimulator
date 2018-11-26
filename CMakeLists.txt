@@ -1,28 +1,25 @@
 cmake_minimum_required(VERSION 3.12)
+# Build type
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    message(STATUS "Setting build type to 'Debug' as none was specified.")
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+    # Set the possible values of build type for cmake-gui
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+endif ()
 project(MulticoreGalaxy)
+include_directories(inc /usr/local/include${OpenCL_INCLUDE_DIRS})
 
+set(CMAKE_MODULE_PATH $"${CMAKE_SOURCE_DIR}/cmake/Modules/" {CMAKE_MODULE_PATH})
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-option(USE_CUDA "Use CUDA" ON)
-
-find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
-find_package(tbb REQUIRED)
-
-include_directories(inc /usr/local/include)
-
-
-
 if (APPLE)
     add_compile_definitions(APPLE)
-    set(LINK ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_gl_LIBRARY} ${GLUT_LIBRARY} tbb)
-else()
-    set(LINK "glut"
-            "GLU"
-            "GL"
-            "GLEW" "tbb")
-endif()
+endif ()
+
+find_package(OpenGL)
+find_package(GLUT)
+find_package(tbb REQUIRED)
+find_package(OpenCL REQUIRED)
 
 file(GLOB_RECURSE UTILS_SOURCE
         src/utils/*)
@@ -39,47 +36,24 @@ file(GLOB_RECURSE DISPLAY_SOURCE
 file(GLOB_RECURSE DISPLAY_INCLUDE
         inc/display/*.hpp)
 
-file(GLOB_RECURSE SOURCE_CUDA
-        src/cuda/*.cu)
-file(GLOB_RECURSE INCLUDE_CUDA
-        inc/cuda/*.hpp)
+file(GLOB_RECURSE KERNEL
+        src/opencl/*.cl)
 
-if( ("${CMAKE_VERSION}" VERSION_EQUAL 3.8) OR
-("${CMAKE_VERSION}" VERSION_GREATER 3.8) )
-    # Modern CMake
-    if(USE_CUDA)
-        enable_language("CUDA")
-        add_executable(MulticoreGalaxy  ${LOGIC_SOURCE} ${LOGIC_INCLUDE}
-                ${UTILS_SOURCE} ${UTILS_INCLUDE} ${INCLUDE_CUDA}
-                ${DISPLAY_SOURCE} ${DISPLAY_INCLUDE} ${SOURCE_CUDA} src/main.cpp)
-        add_executable(MulticoreGalaxyWithoutCuda
-                ${LOGIC_SOURCE} ${LOGIC_INCLUDE}
-                ${UTILS_SOURCE} ${UTILS_INCLUDE}
-                ${DISPLAY_SOURCE} ${DISPLAY_INCLUDE} src/main.cpp)
-    else(USE_CUDA)
-        add_executable(MulticoreGalaxy  ${LOGIC_SOURCE} ${LOGIC_INCLUDE}
-                ${UTILS_SOURCE} ${UTILS_INCLUDE} ${INCLUDE_CUDA}
-                ${DISPLAY_SOURCE} ${DISPLAY_INCLUDE} src/main.cpp)
-    endif()
-else()
-    # Old CMake
-    add_executable(MulticoreGalaxy  ${LOGIC_SOURCE} ${LOGIC_INCLUDE}
-            ${UTILS_SOURCE} ${UTILS_INCLUDE} ${INCLUDE_CUDA}
-            ${DISPLAY_SOURCE} ${DISPLAY_INCLUDE} src/main.cpp)
-    if(USE_CUDA)
-        find_package(CUDA 8.0)
-        if(NOT CUDA_FOUND)
-            message(STATUS "CUDA not found")
-            set(USE_CUDA OFF)
-        else()
-            CUDA_ADD_LIBRARY(MulticoreGalaxy_gpu ${SOURCE_CUDA})
-            target_link_libraries(MulticoreGalaxy MulticoreGalaxy_gpu)
-        endif()
-    endif()
-endif()
-
+if (CMAKE_COMPILER_IS_GNUCC)
+    set (CMAKE_CXX_FLAGS "-D_REETRANT -Wall -Wextra -std=c++14")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb -O0")
+    elseif( CMAKE_BUILD_TYPE STREQUAL "Release" )
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fno-strict-aliasing")
+    endif ()
+endif (CMAKE_COMPILER_IS_GNUCC)
 link_directories("/usr/local/lib/")
-target_link_libraries(MulticoreGalaxy ${LINK})
-target_include_directories(MulticoreGalaxy PRIVATE ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIR} ${GLM_INCLUDE_DIR} ${GLUT_INCLUDE_DIRS} /usr/local/include)
-target_link_libraries(MulticoreGalaxyWithoutCuda ${LINK})
-target_include_directories(MulticoreGalaxyWithoutCuda PRIVATE ${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIR} ${GLM_INCLUDE_DIR} ${GLUT_INCLUDE_DIRS} /usr/local/include)
+add_executable(MulticoreGalaxy
+        ${LOGIC_SOURCE} ${LOGIC_INCLUDE}
+        ${UTILS_SOURCE} ${UTILS_INCLUDE}
+        ${DISPLAY_SOURCE} ${DISPLAY_INCLUDE} ${KERNEL}
+        src/main.cpp)
+target_link_libraries(MulticoreGalaxy ${GLFW_LIBRARIES} ${GLEW_LIBRARIES}
+        ${OPENGL_gl_LIBRARY} ${GLUT_LIBRARY} ${OpenCL_LIBRARY} tbb)
+target_include_directories(MulticoreGalaxy PRIVATE ${GLFW_INCLUDE_DIRS}
+        ${GLEW_INCLUDE_DIR} ${GLM_INCLUDE_DIR} ${GLUT_INCLUDE_DIRS} /usr/local/include)

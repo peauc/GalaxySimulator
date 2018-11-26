@@ -102,6 +102,8 @@ SpacialInformations::operator =(const SpacialInformations &spacialInformations)
 	_accy = spacialInformations.getAccy();
 	_cmx = spacialInformations.getCmx();
 	_cmy = spacialInformations.getCmy();
+	
+	return *this;
 }
 SpacialInformations::SpacialInformations()
 {

@@ -55,6 +55,7 @@ void Quadrant::QuadrantContainer::insertToNode(std::shared_ptr<Star> &item)
 {
 	auto pos = _containerQuadrant.getPosition(*item);
 	auto quad = this->getOrCreateQuadrantAtPosition(pos);
+	quad->depth = this->_containerQuadrant.depth + 1;
 	quad->addToStarList(item);
 }
 

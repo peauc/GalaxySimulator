@@ -58,7 +58,7 @@ void Display::drawQuadrantsRec(class Quadrant &rq)
 void Display::drawQuadrants(std::shared_ptr<RootQuadrant> &rc) {
 	glLineWidth(0.2);
 	glColor3f(0.3, 0.3, 0.3);
-	drawQuadrantsRec(rc->getRootQuadrant());
+	drawQuadrantsRec(rc->getQuadrant());
 }
 
 void Display::render()

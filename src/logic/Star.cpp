@@ -17,6 +17,7 @@ Star::Star(double x, double y, double mass)
 	setCmy(0);
 	setCmx(0);
 	setMass(mass);
+	this->depth = 0;
 }
 
 Star::Star(const Star &star)
@@ -27,6 +28,7 @@ Star::Star(const Star &star)
 }
 Star::Star()
 {
+	this->depth = 0;
 	setY(0);
 	setX(0);
 	setWidth(0);
