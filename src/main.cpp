@@ -23,13 +23,15 @@ void initOpenCL(cl::Program **program, cl::Context **context,cl::Device **defaul
 	
 	//get default device of the default platform
 	std::vector<cl::Device> all_devices;
-	default_platform.getDevices(CL_DEVICE_TYPE_ALL, &all_devices);
+	default_platform.getDevices(CL_DEVICE_TYPE_GPU, &all_devices);
 	if (all_devices.size() == 0) {
 		std::cout << " No devices found. Check OpenCL installation!\n";
 		exit(1);
 	}
-	*default_device = &all_devices[0];
+	*default_device = &all_devices[1];
 	std::cout << "Using device: " << (*default_device)->getInfo<CL_DEVICE_NAME>() << "\n";
+	std::cout << "Precision " << (*default_device)->getInfo<CL_DEVICE_DOUBLE_FP_CONFIG>() << std::endl;
+	
 	
 	
 	*context = new cl::Context({**default_device});
@@ -47,6 +49,7 @@ void initOpenCL(cl::Program **program, cl::Context **context,cl::Device **defaul
 	*program = new cl::Program(**context, sources);
 	if ((*program)->build({**default_device}) != CL_SUCCESS) {
 		std::cout << " Error building: " << (*program)->getBuildInfo<CL_PROGRAM_BUILD_LOG>(**default_device) << "\n";
+		std::cout << " Error building: " << (*program)->getBuildInfo<CL_PROGRAM_BUILD_STATUS>(**default_device) << "\n";
 		exit(1);
 	}
 }
@@ -107,7 +110,7 @@ int main(int ac, char **av) {
 
 	//Create a vector of shared_ptr<Star>, this allow us to fit the stars into the quadtree while still having a strong reference on them
 	std::vector<std::shared_ptr<Star>> vec;
-	vec.emplace_back(std::make_shared<Star>(500, 500, 70000));
+	vec.emplace_back(std::make_shared<Star>(500, 500, 140000));
 	for(int i = 0; i < STAR_NB; ++i) {
 		vec.emplace_back(std::make_shared<Star>(
 			250 + std::rand() % 500,

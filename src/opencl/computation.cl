@@ -1,31 +1,33 @@
+#pragma OPENCL EXTERNSION cl_khr_fp64 : enable
+
 typedef struct m_star {
-	double cmx;
-	double cmy;
-	double height;
-	double width;
-	double accx;
-	double accy;
-	double x;
-	double y;
-	double mass;
+	float cmx;
+	float cmy;
+	float height;
+	float width;
+	float accx;
+	float accy;
+	float x;
+	float y;
+	float mass;
 	unsigned int depth;
 } Star;
 
 typedef struct m_quadrant {
-	double cmx;
-	double cmy;
-	double height;
-	double width;
-	double accx;
-	double accy;
-	double x;
-	double y;
-	double mass;
+	float cmx;
+	float cmy;
+	float height;
+	float width;
+	float accx;
+	float accy;
+	float x;
+	float y;
+	float mass;
 	unsigned int depth;
 } Quadrant;
 
-#define SOFTENER 1000
-#define G 0.0000066742
+#define SOFTENER 100000
+#define G 0.00066742
 #define THETA 0.5
 
 void computeForceSingleQuadrantSingleBody(global Star *star, Quadrant *quad, bool hasChild)
@@ -37,13 +39,17 @@ void computeForceSingleQuadrantSingleBody(global Star *star, Quadrant *quad, boo
 	}
 	if (star->depth > quad->depth)
 		return;
-	double theta = quad->width / (fabs((star->x - quad->x)) + fabs((star->y - quad->y)));
-	if (theta || hasChild) {
-		double dx = star->x - quad->x;
-		double dy = star->y - quad->y;
-		double r = sqrt(pow(dx, 2) + pow(dy, 2) + SOFTENER);
+	float v1 = fabs(star->x - quad->x);
+	float v2 = fabs(star->y - quad->y);
+	float theta = quad->width / (v1 + v2);
+//	// added the theta check
+	//float theta = THETA;
+	if (theta < THETA || hasChild) {
+		float dx = star->x - quad->x;
+		float dy = star->y - quad->y;
+		float r = sqrt(dx * dx + dy * dy + SOFTENER);
 		if (r > 0) {
-			double k = G * star->mass / pow(r, 3);
+			float k = G * star->mass / (r*r*r);
 			star->accx += k * (quad->x - star->x);
 			star->accy += k * (quad->y - star->y);
 		}
@@ -54,7 +60,6 @@ void computeForceSingleQuadrantSingleBody(global Star *star, Quadrant *quad, boo
 //Divide the data so each thread has one
 void kernel test1(global Star *list, unsigned long starSize, Quadrant pQuadrant, bool hasChild)
 {
-	exit(1);
 	for(unsigned int it = 0; it < starSize; it++) {
 		computeForceSingleQuadrantSingleBody(&list[it], &pQuadrant, hasChild);
 	}

@@ -41,16 +41,14 @@ void RootQuadrant::computeAcceleration()
 	queue.enqueueWriteBuffer(d_starArray, CL_TRUE, 0, sizeof(Star) * this->_starVector.size(), starArray);
 	
 	this->getQuadrant().computeAccelerationForQuadrant(starArray, this->_starVector.size(), this->program, this->context, this->defaultDevice, queue, d_starArray);
+	queue.finish();
+	queue.flush();
+	queue.enqueueReadBuffer(d_starArray, CL_TRUE, 0, sizeof(Star) * this->_starVector.size(), starArray);
+
 	for (auto i = 0; i < this->_starVector.size(); i++) {
 		this->_starVector[i]->setAccx(starArray[i].getAccx());
 		this->_starVector[i]->setAccy(starArray[i].getAccy());
 	}
-	// __OLD CODE__
-//	for(auto &it: this->_starVector) {
-//		auto acc = computeTreeForce(this->_rootQuadrant, it, SOFTENER, THETA, G);
-//		it->setAccx(it->getAccx() + acc.first);
-//		it->setAccy(it->getAccy() + acc.second);
-//	}
 }
 
 void RootQuadrant::applyAcceleration()

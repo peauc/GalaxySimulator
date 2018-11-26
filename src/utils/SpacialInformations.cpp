@@ -18,75 +18,75 @@ SpacialInformations::SpacialInformations(SpacialInformations &spacialInformation
 	_cmy = spacialInformations.getCmy();
 }
 
-double SpacialInformations::getX() const
+float SpacialInformations::getX() const
 {
 	return _x;
 }
-void SpacialInformations::setX(double x)
+void SpacialInformations::setX(float x)
 {
 	SpacialInformations::_x = x;
 }
-double SpacialInformations::getY() const
+float SpacialInformations::getY() const
 {
 	return _y;
 }
-void SpacialInformations::setY(double y)
+void SpacialInformations::setY(float y)
 {
 	SpacialInformations::_y = y;
 }
-double SpacialInformations::getMass() const
+float SpacialInformations::getMass() const
 {
 	return _mass;
 }
-void SpacialInformations::setMass(double mass)
+void SpacialInformations::setMass(float mass)
 {
 	SpacialInformations::_mass = mass;
 }
-double SpacialInformations::getHeight() const
+float SpacialInformations::getHeight() const
 {
 	return _height;
 }
-void SpacialInformations::setHeight(double height)
+void SpacialInformations::setHeight(float height)
 {
 	SpacialInformations::_height = height;
 }
-double SpacialInformations::getWidth() const
+float SpacialInformations::getWidth() const
 {
 	return _width;
 }
-void SpacialInformations::setWidth(double width)
+void SpacialInformations::setWidth(float width)
 {
 	SpacialInformations::_width = width;
 }
-double SpacialInformations::getCmx() const
+float SpacialInformations::getCmx() const
 {
 	return _cmx;
 }
-void SpacialInformations::setCmx(double _cmx)
+void SpacialInformations::setCmx(float _cmx)
 {
 	SpacialInformations::_cmx = _cmx;
 }
-double SpacialInformations::getCmy() const
+float SpacialInformations::getCmy() const
 {
 	return _cmy;
 }
-void SpacialInformations::setCmy(double _cmy)
+void SpacialInformations::setCmy(float _cmy)
 {
 	SpacialInformations::_cmy = _cmy;
 }
-double SpacialInformations::getAccx() const
+float SpacialInformations::getAccx() const
 {
 	return _accx;
 }
-void SpacialInformations::setAccx(double _accx)
+void SpacialInformations::setAccx(float _accx)
 {
 	SpacialInformations::_accx = _accx;
 }
-double SpacialInformations::getAccy() const
+float SpacialInformations::getAccy() const
 {
 	return _accy;
 }
-void SpacialInformations::setAccy(double _accy)
+void SpacialInformations::setAccy(float _accy)
 {
 	SpacialInformations::_accy = _accy;
 }

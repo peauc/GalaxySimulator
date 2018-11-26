@@ -212,11 +212,11 @@ void Quadrant::computeAccelerationForQuadrant(Star *starList, unsigned long star
 {
 	cl::Kernel kernel_test = cl::Kernel(*program, "test1");
 	kernel_test.setArg(0, d_starArray);
+	kernel_test.setArg(1, starSize);
+	kernel_test.setArg(2, *this);
+	kernel_test.setArg(3, this->isLeaf());
 	queue.enqueueNDRangeKernel(kernel_test, cl::NullRange, cl::NDRange(5), cl::NullRange);
-	queue.finish();
-	//make kernel and start it
-	
-	//test1(starList, starSize, this, this->isLeaf());
+
 	for(auto &it: this->_links.get_quadrantList()) {
 		if (it) {
 			it->computeAccelerationForQuadrant(starList, starSize, program, context, device, queue, d_starArray);
